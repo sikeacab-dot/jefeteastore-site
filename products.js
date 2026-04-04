@@ -10,9 +10,9 @@ var products = [
             "357": 500
         },
         "images": [
-            "assets/products/prod_5_0.jpg",
-            "assets/products/prod_5_1.jpg",
-            "assets/products/prod_5_2.jpg"
+            "assets/products/prod_3_0.jpg",
+            "assets/products/prod_6_0.jpg",
+            "assets/products/prod_4_1.jpg"
         ],
         "image": "assets/products/image_1.jpg",
         "origin": "Юньнань, Китай",
@@ -35,8 +35,8 @@ var products = [
             "200": 450
         },
         "images": [
-            "assets/products/prod_3_0.jpg",
-            "assets/products/prod_3_1.jpg"
+            "assets/products/prod_4_0.jpg",
+            "assets/products/prod_5_1.jpg"
         ],
         "image": "assets/products/image_2.jpg",
         "origin": "Уїшань, Китай",
@@ -59,8 +59,8 @@ var products = [
             "200": 450
         },
         "images": [
-            "assets/products/prod_4_0.jpg",
-            "assets/products/prod_4_1.jpg"
+            "assets/products/prod_5_0.jpg",
+            "assets/products/prod_5_2.jpg"
         ],
         "image": "assets/products/image_3.jpg",
         "origin": "Фуцзянь, Китай",
@@ -103,7 +103,7 @@ var products = [
             "100": 350
         },
         "images": [
-            "assets/products/prod_6_0.jpg"
+            "assets/products/prod_3_1.jpg"
         ],
         "image": "assets/products/image_5.jpg",
         "origin": "Уїшань, Китай",
