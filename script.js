@@ -74,7 +74,6 @@ const UI = {
     },
 
     syncDatabase() {
-        // Checking both window.products and global products
         const dbSource = window.products || (typeof products !== 'undefined' ? products : null);
 
         if (dbSource && dbSource.length > 0) {
@@ -82,12 +81,13 @@ const UI = {
             console.log(`JEFE TEASTORE: Data Synchronized. Entries: ${State.db.length}`);
             this.buildUI();
         } else {
-            console.warn("JEFE TEASTORE: Waiting for products.js to load...");
-            setTimeout(() => this.syncDatabase(), 100);
+            console.log('JEFE TEASTORE: Waiting for products database...');
+            setTimeout(() => this.syncDatabase(), 200);
         }
     },
 
     buildUI() {
+        document.body.classList.add('loaded');
         this.renderProducts(); // Render 8 random first
         this.renderCategories();
         this.setupSplitText();
