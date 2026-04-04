@@ -121,8 +121,7 @@ const UI = {
         let items = [];
 
         if (filter === 'all') {
-            // Get 8 random for the main screen
-            items = [...State.db].sort(() => 0.5 - Math.random()).slice(0, 8);
+            items = [...State.db];
         } else {
             items = State.db.filter(p => p.category === filter);
         }
@@ -132,12 +131,16 @@ const UI = {
             return;
         }
 
-        grid.innerHTML = items.map(p => {
+        grid.innerHTML = items.map((p, idx) => {
             const imgSrc = (p.images && p.images[0]) || p.image || '';
             const blurData = (window.PLACEHOLDERS && window.PLACEHOLDERS[imgSrc]) || '';
             const price = p.variants 
                 ? (p.variants['100'] || Object.values(p.variants)[0]) 
                 : (p.price || 0);
+            // First 4 cards: eager load with high priority (above the fold)
+            const isAboveFold = idx < 4;
+            const loadAttr = isAboveFold ? 'eager' : 'lazy';
+            const priorityAttr = isAboveFold ? 'fetchpriority="high"' : '';
 
             return `
                 <div class="card reveal" onclick="UI.openDetail(${p.id})">
@@ -145,7 +148,9 @@ const UI = {
                         <img src="${imgSrc}" 
                              style="background-image: url('${blurData}')" 
                              onload="this.classList.add('loaded')"
-                             loading="lazy" 
+                             loading="${loadAttr}" 
+                             decoding="async"
+                             ${priorityAttr}
                              alt="${p.name}">
                     </div>
                     <p class="card-cat">${p.category}</p>
@@ -354,17 +359,10 @@ const UI = {
             ? `<div class="detail-no-img"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`
             : `<div class="img-slider" id="img-slider-${id}">
                     <div class="img-slider-track" id="img-track-${id}">
-                        ${images.map((src, i) => {
-                            const blur = (window.PLACEHOLDERS && window.PLACEHOLDERS[src]) || '';
-                            return `
+                        ${images.map((src, i) => `
                             <div class="img-slide">
-                                <img src="${src}" 
-                                     style="background-image: url('${blur}'); background-size: cover;" 
-                                     onload="this.classList.add('loaded')"
-                                     alt="${p.name} ${i+1}" 
-                                     loading="${i === 0 ? 'eager' : 'lazy'}">
-                            </div>`;
-                        }).join('')}
+                                <img src="${src}" alt="${p.name} ${i+1}" loading="${i === 0 ? 'eager' : 'lazy'}">
+                            </div>`).join('')}
                     </div>
                     ${hasMultiple ? `
                         <button class="img-slider-btn img-slider-prev" onclick="UI.slideImg('${id}', -1)" aria-label="Попереднє">
@@ -377,17 +375,10 @@ const UI = {
                             ${images.map((_, i) => `<button class="img-dot${i===0?' active':''}" onclick="UI.goToSlide('${id}', ${i})"></button>`).join('')}
                         </div>
                         <div class="img-slider-thumbs" id="img-thumbs-${id}">
-                            ${images.map((src, i) => {
-                                const blur = (window.PLACEHOLDERS && window.PLACEHOLDERS[src]) || '';
-                                return `
+                            ${images.map((src, i) => `
                                 <div class="img-thumb${i===0?' active':''}" onclick="UI.goToSlide('${id}', ${i})">
-                                    <img src="${src}" 
-                                         style="background-image: url('${blur}'); background-size: cover;" 
-                                         onload="this.classList.add('loaded')"
-                                         alt="thumb ${i+1}" 
-                                         loading="lazy">
-                                </div>`;
-                            }).join('')}
+                                    <img src="${src}" alt="thumb ${i+1}" loading="lazy">
+                                </div>`).join('')}
                         </div>` : ''}
                 </div>`;
 
