@@ -66,8 +66,7 @@ const UI = {
         }
         window.scrollTo(0, 0);
         
-        // FCTA: Show bubble after 5s
-        setTimeout(() => this.toggleFcta(null, true), 5000);
+        // Initial Data Sync Fallback
 
         // Data Sync Fallback
         this.syncDatabase();
@@ -215,16 +214,6 @@ const UI = {
 
         sidebar.classList.toggle('active', open);
         document.body.style.overflow = open ? 'hidden' : 'auto';
-
-        // Hide help button if cart is open
-        const fcta = document.getElementById('float-cta');
-        if (fcta) {
-            if (type === 'cart' && open) {
-                fcta.style.display = 'none';
-            } else if (type === 'cart' && !open) {
-                fcta.style.display = 'flex';
-            }
-        }
     },
 
     toggleSearch(open) {
@@ -795,52 +784,6 @@ ${deliveryInfo}
         localStorage.removeItem('jefe_cart');
         this.updateCartUI();
         this.toggleCheckout(false);
-    },
-
-    toggleFcta(e, show) {
-        if (e) e.stopPropagation();
-        const fcta = document.getElementById('float-cta');
-        if (!fcta) return;
-        
-        if (show) {
-            fcta.classList.remove('collapsed');
-            
-            // Auto-hide after 10s if not interacted
-            if (this._fctaTimer) clearTimeout(this._fctaTimer);
-            this._fctaTimer = setTimeout(() => {
-                this.toggleFcta(null, false);
-            }, 10000);
-
-            // Hide on scroll or global click
-            const hideHandler = () => {
-                this.toggleFcta(null, false);
-                window.removeEventListener('scroll', hideHandler);
-                document.removeEventListener('mousedown', hideHandler);
-            };
-            
-            // Wait a tiny bit to prevent instant hide
-            setTimeout(() => {
-                window.addEventListener('scroll', hideHandler, { once: true });
-                document.addEventListener('mousedown', (e) => {
-                    if (!fcta.contains(e.target)) hideHandler();
-                }, { once: true });
-            }, 500);
-
-        } else {
-            fcta.classList.add('collapsed');
-            if (this._fctaTimer) clearTimeout(this._fctaTimer);
-        }
-    },
-
-    handleFctaClick() {
-        const fcta = document.getElementById('float-cta');
-        if (!fcta) return;
-        
-        if (fcta.classList.contains('collapsed')) {
-            this.toggleFcta(null, true);
-        } else {
-            FooterModal.open('manager');
-        }
     },
 
     toggleMessengerOptions(show) {
