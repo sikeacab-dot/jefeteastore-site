@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="description" content="JEFE TEASTORE — преміальний китайський чай: Пуер, Улун, Габа. Справжня чайна культура в самому серці Києва.">
+    <meta name="keywords" content="китайський чай, купити чай київ, пуер, улун, габа, jefeteastore, чайний магазин">
+    <meta name="author" content="JEFE">
+    <link rel="canonical" href="https://jefetea.com.ua/">
+    <title>JEFE TEASTORE | URBAN TEA CULTURE</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        @font-face {
+            font-family: 'Agoka';
+            src: local('Agoka Family'), local('Agoka'); /* Assuming installed on user's Mac */
+        }
+    </style>
+</head>
+<body>
+    <!-- Aesthetics -->
+    <div class="grain"></div>
+    <div class="mesh-glow"></div>
+    <div class="cursor"></div>
+
+    <!-- Navigation Header -->
+    <header>
+        <a href="#home" class="brand">
+            <img src="assets/new_logo.png" alt="JEFE" class="brand-img">
+        </a>
+        <div class="nav-links">
+            <button class="nav-btn search-toggle-btn" id="search-toggle-btn" onclick="UI.toggleSearch(true)" aria-label="Пошук">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
+                    <path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </button>
+            <div class="dropdown">
+                <button class="nav-btn dropdown-btn">Каталог</button>
+                <div class="dropdown-content">
+                    <a href="#collection" onclick="UI.filterBy('all')">Наші чаї</a>
+                    <a href="blog.html">Блог</a>
+                    <a href="#" onclick="FooterModal.open('contacts')">Контакти</a>
+                </div>
+            </div>
+            <button class="nav-btn" onclick="UI.toggleSidebar('cart', true)">Кошик (<span id="cart-qty">0</span>)</button>
+        </div>
+    </header>
+
+    <main id="home">
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1 class="hero-main-title">jefeteastore</h1>
+            <p class="hero-subtext">Chinese Tea from Mountains</p>
+            
+            <div class="hero-cat-links">
+                <a href="#collection" class="hcat-pill" onclick="UI.filterBy('Puerh')">Пуер</a>
+                <a href="#collection" class="hcat-pill" onclick="UI.filterBy('Oolong')">Улун</a>
+                <a href="#collection" class="hcat-pill" onclick="UI.filterBy('Gaba')">Габа</a>
+                <a href="#collection" class="hcat-pill" onclick="UI.filterBy('Sets')">Набори</a>
+            </div>
+            
+            <!-- Scroll Down Indicator -->
+            <a href="#collection" class="scroll-indicator" id="scroll-indicator" aria-label="Прокрути вниз">
+                <span class="scroll-text">прокрути</span>
+                <div class="scroll-arrow">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 5v14M5 12l7 7 7-7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+            </a>
+        </section>
+
+        <!-- Catalog Section -->
+        <section class="collection" id="collection">
+            <div class="section-head">
+                <h2 class="section-title">Наші Чаї<span style="color: var(--orange);">.</span></h2>
+                <!-- Category filter tabs -->
+                <div class="cat-filter-tabs" id="cat-filter-tabs">
+                    <button class="cat-tab active" data-cat="all" onclick="UI.filterBy('all', this)">Всі</button>
+                    <button class="cat-tab" data-cat="Puerh" onclick="UI.filterBy('Puerh', this)">Пуер</button>
+                    <button class="cat-tab" data-cat="Oolong" onclick="UI.filterBy('Oolong', this)">Улун</button>
+                    <button class="cat-tab" data-cat="Gaba" onclick="UI.filterBy('Gaba', this)">Габа</button>
+                    <button class="cat-tab" data-cat="Sets" onclick="UI.filterBy('Sets', this)">Набори</button>
+                </div>
+            </div>
+
+            <div id="product-grid" class="product-grid">
+                <!-- Products injected via JS -->
+            </div>
+        </section>
+    </main>
+
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <!-- Top: brand + socials -->
+        <div class="footer-top">
+            <div class="footer-subscription">
+                <div class="f-sub-text">
+                    <h4>Свіжі новини та поставки</h4>
+                    <p>Підписуйся, щоб знати про нові колекції першим</p>
+                </div>
+                <form class="f-sub-form" onsubmit="Marketing.handleNewsletter(event)">
+                    <input type="email" id="footer-news-email" placeholder="Твій email..." required>
+                    <button type="submit">Підписатися</button>
+                </form>
+            </div>
+            <div class="footer-socials">
+                <!-- Manager Support -->
+                <button class="social-btn" onclick="FooterModal.open('manager')" style="background: rgba(255, 90, 0, 0.1); border-color: rgba(255, 90, 0, 0.4);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="1.8">
+                        <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+                    </svg>
+                    <span style="color: var(--orange); font-weight: 800;">Написати менеджеру</span>
+                </button>
+
+                <!-- Instagram -->
+                <a href="https://www.instagram.com/jefeteastore/" target="_blank" rel="noopener" class="social-btn" aria-label="Instagram">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <rect x="2" y="2" width="20" height="20" rx="5"/>
+                        <circle cx="12" cy="12" r="4.5"/>
+                        <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
+                    </svg>
+                    <span>Instagram</span>
+                </a>
+                <!-- Telegram -->
+                <a href="https://t.me/+WSuKqtoRVDw4ODIy" target="_blank" rel="noopener" class="social-btn" aria-label="Telegram">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <path d="M21.5 3L2 10.5l6.5 2.5L18 7l-7 8 .5 6.5 3.5-3.5 4.5 3.5L21.5 3z"/>
+                    </svg>
+                    <span>Telegram</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="footer-divider"></div>
+
+
+        <!-- Mid: 4 columns -->
+        <div class="footer-cols">
+            <div class="footer-col">
+                <div class="footer-col-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8l1 12h12l1-12"/></svg>
+                </div>
+                <h5>Доставка</h5>
+                <p>Нова Пошта, кур'єром по Києву</p>
+                <button class="footer-modal-btn" onclick="FooterModal.open('delivery')">Детальніше →</button>
+            </div>
+            <div class="footer-col">
+                <div class="footer-col-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16v16H4z"/><path d="M9 9l6 6M15 9l-6 6"/></svg>
+                </div>
+                <h5>Обмін та повернення</h5>
+                <p>Згідно законодавства України</p>
+                <button class="footer-modal-btn" onclick="FooterModal.open('returns')">Детальніше →</button>
+            </div>
+            <div class="footer-col">
+                <div class="footer-col-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                </div>
+                <h5>Самовивіз</h5>
+                <p>вул. Нагірна, 16 · Київ</p>
+                <button class="footer-modal-btn" onclick="FooterModal.open('pickup')">Детальніше →</button>
+            </div>
+            <div class="footer-col">
+                <div class="footer-col-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.63A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+                </div>
+                <h5>Контакти</h5>
+                <p>+380&nbsp;96&nbsp;234&nbsp;44&nbsp;192</p>
+            </div>
+        </div>
+
+        <div class="footer-divider"></div>
+
+        <!-- Bottom bar -->
+        <div class="footer-bottom">
+            <span class="footer-copy">© 2025 JEFE Collective. Всі права захищені.</span>
+        </div>
+    </footer>
+
+    <!-- ══ FOOTER MODALS ═══════════════════════════════════════ -->
+
+    <!-- Modal: Delivery -->
+    <div class="fmodal-overlay" id="fmodal-delivery" onclick="FooterModal.closeAll(event)">
+        <div class="fmodal-box">
+            <button class="fmodal-close" onclick="FooterModal.close('delivery')">×</button>
+            <div class="fmodal-icon">📦</div>
+            <h3>Умови доставки</h3>
+            <div class="fmodal-content">
+                <div class="fmodal-item">
+                    <strong>Нова Пошта</strong>
+                    <p>По всій Україні. Терміни: 1–3 робочі дні. Вартість — за тарифами перевізника.</p>
+                </div>
+                <div class="fmodal-item">
+                    <strong>Кур'єром по Києву</strong>
+                    <p>Доставка в день замовлення або на наступний день. Вартість: від 80 ₴.</p>
+                </div>
+                <div class="fmodal-item">
+                    <strong>Безкоштовна доставка</strong>
+                    <p>При замовленні від 1500 ₴ — безкоштовна доставка Новою Поштою.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Returns -->
+    <div class="fmodal-overlay" id="fmodal-returns" onclick="FooterModal.closeAll(event)">
+        <div class="fmodal-box">
+            <button class="fmodal-close" onclick="FooterModal.close('returns')">×</button>
+            <div class="fmodal-icon">↩️</div>
+            <h3>Обмін та повернення</h3>
+            <div class="fmodal-content">
+                <div class="fmodal-item">
+                    <strong>Ваші права</strong>
+                    <p>Відповідно до ЗУ «Про захист прав споживачів» ви маєте право повернути товар протягом <em>14 календарних днів</em> з дня отримання.</p>
+                </div>
+                <div class="fmodal-item">
+                    <strong>Умови повернення</strong>
+                    <p>Товар повинен бути у незміненому вигляді, з оригінальним пакуванням, без слідів використання.</p>
+                </div>
+                <div class="fmodal-item">
+                    <strong>Неналежна якість</strong>
+                    <p>Якщо товар неналежної якості — обмін або повне повернення коштів протягом 2 робочих днів після отримання фото/відео підтвердження.</p>
+                </div>
+                <div class="fmodal-item">
+                    <strong>Як повернути</strong>
+                    <p>Зв'яжіться з нами зручним способом, ми надішлемо реквізити для повернення товару самовивозом або Новою Поштою.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Pickup -->
+    <div class="fmodal-overlay" id="fmodal-pickup" onclick="FooterModal.closeAll(event)">
+        <div class="fmodal-box">
+            <button class="fmodal-close" onclick="FooterModal.close('pickup')">×</button>
+            <div class="fmodal-icon">📍</div>
+            <h3>Самовивіз</h3>
+            <div class="fmodal-content">
+                <div class="fmodal-item">
+                    <strong>Адреса чайної</strong>
+                    <p>вул. Нагірна, 16 · Київ</p>
+                </div>
+                <div class="fmodal-item">
+                    <strong>Графік роботи</strong>
+                    <p>Пн–Пт: 11:00 – 20:00<br>Сб–Нд: 12:00 – 19:00</p>
+                </div>
+                <div class="fmodal-item">
+                    <strong>Як забрати</strong>
+                    <p>Після оформлення замовлення ми підтвердимо наявність і повідомимо, коли товар готовий до видачі. Самовивіз безкоштовний.</p>
+                </div>
+            </div>
+            <a href="https://maps.google.com/?q=вулиця+Нагірна+16+Київ" target="_blank" class="fmodal-map-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                Відкрити на картах
+            </a>
+        </div>
+    </div>
+
+    <!-- Modal: Contacts -->
+    <div class="fmodal-overlay" id="fmodal-contacts" onclick="FooterModal.closeAll(event)">
+        <div class="fmodal-box">
+            <button class="fmodal-close" onclick="FooterModal.close('contacts')">×</button>
+            <div class="fmodal-icon">📞</div>
+            <h3>Контакти</h3>
+            <div class="fmodal-content">
+                <div class="fmodal-item">
+                    <strong>Телефон / WhatsApp</strong>
+                    <p><a href="tel:+380962344192" class="fmodal-contact-link">+380 96 234 44 192</a></p>
+                </div>
+                <div class="fmodal-item">
+                    <strong>Telegram</strong>
+                    <p><a href="https://t.me/+WSuKqtoRVDw4ODIy" target="_blank" rel="noopener" class="fmodal-contact-link">Підписатись на канал</a></p>
+                </div>
+                <div class="fmodal-item">
+                    <strong>Instagram</strong>
+                    <p><a href="https://www.instagram.com/jefeteastore/" target="_blank" rel="noopener" class="fmodal-contact-link">@jefeteastore</a></p>
+                </div>
+                <div class="fmodal-item">
+                    <strong>Час відповіді</strong>
+                    <p>Зазвичай відповідаємо протягом 1–2 годин у робочий час.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manager Popup (Bottom Right) -->
+    <div class="manager-popup" id="fmodal-manager">
+        <div class="mp-box">
+            <button class="mp-close" onclick="FooterModal.close('manager')">×</button>
+            <div class="mp-header">
+                <div class="mp-icon">💬</div>
+                <div>
+                    <h4>Написати менеджеру</h4>
+                    <p>Зазвичай відповідаємо за 5-10 хв</p>
+                </div>
+            </div>
+            
+            <div class="mp-body">
+                <div class="mp-field">
+                    <label>Ваше ім'я</label>
+                    <input type="text" id="mgr-name" placeholder="Олександр">
+                </div>
+                
+                <div class="mp-field">
+                    <label>Номер для зв'язку</label>
+                    <input type="tel" id="mgr-phone" placeholder="+380 XX XXX XX XX">
+                </div>
+
+                <div class="mp-field">
+                    <label>Як вам зручніше відповісти?</label>
+                    <div class="mp-chips">
+                        <label class="mp-chip">
+                            <input type="radio" name="comm-pref" value="call" checked onchange="UI.toggleMessengerOptions(false)">
+                            <span class="chip-label">📞 Дзвінок</span>
+                        </label>
+                        <label class="mp-chip">
+                            <input type="radio" name="comm-pref" value="msg" onchange="UI.toggleMessengerOptions(true)">
+                            <span class="chip-label">💬 Месенджер</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Conditional Messenger Options -->
+                <div class="mp-field" id="messenger-sub-options" style="display: none;">
+                    <label>Оберіть месенджер</label>
+                    <div class="mp-chips mp-chips--small">
+                        <label class="mp-chip">
+                            <input type="radio" name="msg-type" value="viber" checked>
+                            <span class="chip-label">Viber</span>
+                        </label>
+                        <label class="mp-chip">
+                            <input type="radio" name="msg-type" value="whatsapp">
+                            <span class="chip-label">WhatsApp</span>
+                        </label>
+                        <label class="mp-chip">
+                            <input type="radio" name="msg-type" value="telegram">
+                            <span class="chip-label">Telegram</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="mp-field">
+                    <label>Ваше запитання (необов'язково)</label>
+                    <textarea id="mgr-question" placeholder="Хочу замовити улун..."></textarea>
+                </div>
+
+                <button class="mp-submit" onclick="FooterModal.submitForm(event)">Надіслати запит</button>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Sidebar: Catalog / Category Breakdown -->
+    <div id="cat-sidebar" class="sidebar">
+        <div class="sidebar-overlay" onclick="UI.toggleSidebar('cat', false)"></div>
+        <div class="sidebar-content">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 40px;">
+                <h3 style="font-family: var(--font-body); font-weight: 900; font-size: 2rem;">Категорії</h3>
+                <button class="nav-btn" onclick="UI.toggleSidebar('cat', false)" style="font-size: 1.5rem;">&times;</button>
+            </div>
+            <div id="cat-list" style="display: flex; flex-direction: column; gap: 20px;">
+                <!-- Categories injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar: Shopping Box -->
+    <div id="cart-sidebar" class="sidebar">
+        <div class="sidebar-overlay" onclick="UI.toggleSidebar('cart', false)"></div>
+        <div class="sidebar-content">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 40px;">
+                <h3 style="font-family: var(--font-body); font-weight: 900; font-size: 2rem;">Кошик</h3>
+                <button class="nav-btn" onclick="UI.toggleSidebar('cart', false)" style="font-size: 1.5rem;">&times;</button>
+            </div>
+            <div id="cart-items" style="flex: 1; overflow-y: auto;">
+                <!-- Cart items -->
+            </div>
+            <div id="cart-footer-block" style="padding-top: 30px; border-top: 1px solid var(--border);">
+                <div style="display: flex; justify-content: space-between; font-size: 1.8rem; margin-bottom: 20px;">
+                    <span>Сума</span>
+                    <span id="cart-total">0₴</span>
+                </div>
+                <button class="btn-checkout" onclick="UI.checkout()">Оформити замовлення</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Detail Modal -->
+    <div id="product-detail" class="detail-view">
+        <div class="detail-header">
+            <button class="nav-btn" onclick="UI.closeDetail()" style="font-size: 2rem;">&times;</button>
+        </div>
+        <div id="detail-content">
+            <!-- Dynamic Content -->
+        </div>
+    </div>
+
+    <!-- Search Overlay -->
+    <div id="search-overlay" class="search-overlay">
+        <div class="search-overlay-bg" onclick="UI.toggleSearch(false)"></div>
+        <div class="search-panel">
+            <div class="search-input-wrap">
+                <svg class="search-icon-inner" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
+                    <path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <input type="text" id="search-input" class="search-input" placeholder="Знайти чай..." autocomplete="off" oninput="UI.handleSearch(this.value)">
+                <button class="search-close-btn" onclick="UI.toggleSearch(false)" aria-label="Закрити">&times;</button>
+            </div>
+            <div class="search-hint" id="search-hint">Почни вводити назву чаю або категорію</div>
+            <div id="search-results" class="search-results"></div>
+        </div>
+    </div>
+
+    <!-- Floating CTA Widget -->
+    <div id="float-cta" class="float-cta collapsed">
+        <div class="fcta-bubble" id="fcta-bubble" onclick="UI.handleFctaClick()">
+            <span class="fcta-text">Потрібна допомога з вибором?</span>
+            <button class="fcta-close" onclick="UI.toggleFcta(event, false)">×</button>
+        </div>
+        <button class="fcta-icon-btn" onclick="UI.handleFctaClick()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div id="checkout-modal" class="fmodal-overlay" onclick="UI.toggleCheckout(false, event)">
+        <div class="fmodal-box checkout-box">
+            <button class="fmodal-close" onclick="UI.toggleCheckout(false)">&times;</button>
+            <div class="fmodal-icon" style="font-size: 2.5rem; margin-bottom: 10px;">🛒</div>
+            <h3>Оформлення замовлення</h3>
+            
+            <form id="checkout-form" onsubmit="UI.handleCheckoutSubmit(event)">
+                <div class="checkout-fields">
+                    <div class="c-field">
+                        <label>ПІБ *</label>
+                        <input type="text" id="co-name" placeholder="Іванов Іван" required>
+                    </div>
+                    
+                    <div class="c-field">
+                        <label>Номер телефону *</label>
+                        <input type="tel" id="co-phone" value="+380" placeholder="+380 XX XXX XX XX" required>
+                    </div>
+                    
+                    <div class="c-field">
+                        <label>Email (необов'язково)</label>
+                        <input type="text" id="co-email" placeholder="example@mail.com">
+                    </div>
+
+                    <div class="c-field">
+                        <label>Спосіб отримання</label>
+                        <div class="co-options">
+                            <label class="co-option">
+                                <input type="radio" name="delivery-type" value="pickup" checked onchange="UI.onDeliveryTypeChange('pickup')">
+                                <span>Самовивіз</span>
+                            </label>
+                            <label class="co-option">
+                                <input type="radio" name="delivery-type" value="delivery" onchange="UI.onDeliveryTypeChange('delivery')">
+                                <span>Доставка</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Pickup Address -->
+                    <div id="co-pickup-info" class="co-info-block">
+                        <div class="co-info-text">
+                            <strong>Адреса:</strong> Нагірна 16, Київ
+                        </div>
+                    </div>
+
+                    <!-- Delivery Options (Conditional) -->
+                    <div id="co-delivery-options" style="display: none;">
+                        <div class="c-field">
+                            <label>Варіант доставки</label>
+                            <div class="co-options">
+                                <label class="co-option">
+                                    <input type="radio" name="courier-type" value="np" checked onchange="UI.onCourierChange('np')">
+                                    <span>Нова Пошта</span>
+                                </label>
+                                <label class="co-option">
+                                    <input type="radio" name="courier-type" value="taxi" onchange="UI.onCourierChange('taxi')">
+                                    <span>Таксі</span>
+                                </label>
+                            </div>
+                            <small class="co-hint">За тарифами перевізника</small>
+                        </div>
+
+                        <!-- Nova Poshta Fields -->
+                        <div id="co-np-fields">
+                            <div class="c-field">
+                                <label>Місто *</label>
+                                <input type="text" id="co-np-city" placeholder="Київ">
+                            </div>
+                            <div class="c-field">
+                                <label>№ Відділення або поштомату *</label>
+                                <input type="text" id="co-np-branch" placeholder="Відділення №1">
+                            </div>
+                        </div>
+
+                        <!-- Taxi Fields -->
+                        <div id="co-taxi-fields" style="display: none;">
+                            <div class="c-field">
+                                <label>Адреса доставки *</label>
+                                <input type="text" id="co-taxi-address" placeholder="вул. Хрещатик, 1">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="c-field">
+                        <label>Коментар до замовлення</label>
+                        <textarea id="co-comment" placeholder="Наприклад: зателефонуйте перед доставкою..."></textarea>
+                    </div>
+                </div>
+
+                <div class="checkout-footer">
+                    <div class="checkout-total">Сума: <span id="co-total">0₴</span></div>
+                    <button type="submit" class="btn-submit-order">Підтвердити замовлення</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="products.js"></script>
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>jefeteastore | Блог про чай та культуру</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --blog-bg: #050505;
+        }
+
+        body {
+            background: var(--blog-bg);
+            padding-top: 120px;
+            color: #fff;
+            scroll-behavior: smooth;
+        }
+
+        .blog-header {
+            text-align: center;
+            max-width: 1000px;
+            margin: 0 auto 100px;
+            padding: 0 24px;
+        }
+
+        .blog-header h1 {
+            font-size: clamp(2.5rem, 8vw, 4.8rem);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            margin-bottom: 25px;
+            line-height: 1.1;
+            color: #fff;
+            font-style: normal !important;
+        }
+
+        .blog-header p {
+            font-size: 0.9rem;
+            color: var(--orange);
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 10px;
+            font-style: normal !important;
+        }
+
+        .blog-grid {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 40px 120px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 40px;
+        }
+
+        .blog-card {
+            background: rgba(255,255,255,0.01);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+            position: relative;
+            backdrop-filter: blur(5px);
+        }
+
+        .blog-card:hover {
+            background: rgba(255,255,255,0.03);
+            border-color: var(--orange);
+            transform: translateY(-5px);
+        }
+
+        .blog-tag {
+            font-size: 0.6rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--orange);
+            background: rgba(255, 90, 0, 0.05);
+            padding: 6px 14px;
+            border-radius: 4px;
+            width: fit-content;
+        }
+
+        .blog-title {
+            font-size: 1.6rem;
+            font-weight: 900;
+            line-height: 1.25;
+            color: #fff;
+        }
+
+        .blog-excerpt {
+            font-size: 0.95rem;
+            line-height: 1.7;
+            color: rgba(255,255,255,0.45);
+        }
+
+        .blog-read-more {
+            margin-top: auto;
+            font-size: 0.7rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #fff;
+            opacity: 0.6;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: opacity 0.3s;
+        }
+
+        .blog-card:hover .blog-read-more { opacity: 1; }
+
+        /* Article Overlay */
+        #article-view {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 5000;
+            padding: 80px 24px;
+            overflow-y: auto;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        #article-view.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .article-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .article-back {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.3);
+            font-size: 0.8rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            cursor: pointer;
+            margin-bottom: 60px;
+            transition: color 0.3s;
+        }
+
+        .article-back:hover { color: var(--orange); }
+
+        .article-header h2 {
+            font-size: clamp(2.2rem, 7vw, 3.8rem);
+            font-weight: 900;
+            line-height: 1.15;
+            margin: 20px 0 50px;
+            text-transform: uppercase;
+            color: #fff;
+            letter-spacing: -0.5px;
+        }
+
+        .article-text {
+            font-size: 1.15rem;
+            line-height: 2;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .article-text p { margin-bottom: 35px; }
+
+        .article-text h3 {
+            color: #fff;
+            font-size: 1.8rem;
+            margin: 60px 0 30px;
+            font-weight: 900;
+            text-transform: uppercase;
+            border-left: 3px solid var(--orange);
+            padding-left: 24px;
+        }
+
+        .article-text strong { color: #fff; font-weight: 800; }
+
+        @media (max-width: 768px) {
+            .blog-header h1 { font-size: 2.2rem; }
+            .article-header h2 { font-size: 2rem; }
+            .blog-grid { padding: 40px 20px; gap: 20px; }
+            .blog-card { padding: 30px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="grain"></div>
+    <div class="mesh-glow"></div>
+
+    <header>
+        <a href="index.html" class="brand">
+            <img src="assets/new_logo.png" class="footer-logo" alt="Logo">
+        </a>
+        <nav style="display: flex; gap: 30px; align-items: center;">
+            <a href="index.html" style="text-decoration: none; color: #fff; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; font-weight: 800;">Головна</a>
+            <a href="index.html#collection" style="text-decoration: none; color: #fff; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; font-weight: 800;">Каталог</a>
+            <a href="#" onclick="FooterModal.open('contacts')" style="text-decoration: none; color: #fff; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; font-weight: 800;">Контакти</a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="blog-header">
+            <p>Твій гід у світ чаю</p>
+            <h1>ВСЕ ПРО ЧАЙ <span style="color: var(--orange);">ТА КУЛЬТУРУ.</span></h1>
+        </div>
+
+        <div class="blog-grid" id="blog-grid"></div>
+    </main>
+
+    <div id="article-view">
+        <div class="article-container" id="article-content"></div>
+    </div>
+
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-top">
+            <div class="footer-subscription">
+                <div class="f-sub-text">
+                    <h4>Свіжі новини та поставки</h4>
+                    <p>Підписуйся, щоб знати про нові колекції першим</p>
+                </div>
+                <form class="f-sub-form" onsubmit="Marketing.handleNewsletter(event)">
+                    <input type="email" id="footer-news-email" placeholder="Твій email..." required>
+                    <button type="submit">Підписатися</button>
+                </form>
+            </div>
+            <div class="footer-socials">
+                <button class="social-btn" onclick="FooterModal.open('manager')" style="background: rgba(255, 90, 0, 0.1); border-color: rgba(255, 90, 0, 0.4);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="1.8">
+                        <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+                    </svg>
+                    <span style="color: var(--orange); font-weight: 800;">Написати менеджеру</span>
+                </button>
+                <a href="https://www.instagram.com/jefeteastore/" target="_blank" rel="noopener" class="social-btn" aria-label="Instagram">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4.5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
+                    </svg>
+                    <span>Instagram</span>
+                </a>
+                <a href="https://t.me/+WSuKqtoRVDw4ODIy" target="_blank" rel="noopener" class="social-btn" aria-label="Telegram">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <path d="M21.5 3L2 10.5l6.5 2.5L18 7l-7 8 .5 6.5 3.5-3.5 4.5 3.5L21.5 3z"/>
+                    </svg>
+                    <span>Telegram</span>
+                </a>
+            </div>
+        </div>
+        <div class="footer-divider"></div>
+        <div class="footer-cols">
+            <div class="footer-col">
+                <h5>Доставка</h5>
+                <p>Нова Пошта, кур'єром по Києву</p>
+                <button class="footer-modal-btn" onclick="FooterModal.open('delivery')">Детальніше →</button>
+            </div>
+            <div class="footer-col">
+                <h5>Обмін та повернення</h5>
+                <p>Згідно законодавства України</p>
+                <button class="footer-modal-btn" onclick="FooterModal.open('returns')">Детальніше →</button>
+            </div>
+            <div class="footer-col">
+                <h5>Самовивіз</h5>
+                <p>вул. Нагірна, 16 · Київ</p>
+                <button class="footer-modal-btn" onclick="FooterModal.open('pickup')">Детальніше →</button>
+            </div>
+            <div class="footer-col">
+                <h5>Контакти</h5>
+                <p>+380&nbsp;96&nbsp;234&nbsp;44&nbsp;192</p>
+            </div>
+        </div>
+        <div class="footer-divider"></div>
+        <div class="footer-bottom">
+            <span class="footer-copy">© 2025 JEFE Collective. Всі права захищені.</span>
+        </div>
+    </footer>
+
+    <!-- Footer Modals (Blog context) -->
+    <div class="fmodal-overlay" id="fmodal-delivery" onclick="FooterModal.closeAll(event)">
+        <div class="fmodal-box">
+            <button class="fmodal-close" onclick="FooterModal.close('delivery')">×</button>
+            <h3>Умови доставки</h3>
+            <div class="fmodal-content">
+                <div class="fmodal-item"><strong>Нова Пошта</strong><p>1–3 дні. За тарифами перевізника.</p></div>
+                <div class="fmodal-item"><strong>Самовивіз</strong><p>Безкоштовно. Київ, вул. Нагірна, 16.</p></div>
+            </div>
+        </div>
+    </div>
+    <div class="fmodal-overlay" id="fmodal-contacts" onclick="FooterModal.closeAll(event)">
+        <div class="fmodal-box">
+            <button class="fmodal-close" onclick="FooterModal.close('contacts')">×</button>
+            <h3>Контакти</h3>
+            <div class="fmodal-content">
+                <div class="fmodal-item">
+                    <strong>Телефон / WhatsApp</strong>
+                    <p><a href="tel:+380962344192" class="fmodal-contact-link">+380 96 234 44 192</a></p>
+                </div>
+                <div class="fmodal-item">
+                    <strong>Telegram</strong>
+                    <p><a href="https://t.me/+WSuKqtoRVDw4ODIy" target="_blank" rel="noopener" class="fmodal-contact-link">Підписатись на канал</a></p>
+                </div>
+                <div class="fmodal-item">
+                    <strong>Instagram</strong>
+                    <p><a href="https://www.instagram.com/jefeteastore/" target="_blank" rel="noopener" class="fmodal-contact-link">@jefeteastore</a></p>
+                </div>
+                <div class="fmodal-item">
+                    <strong>Час відповіді</strong>
+                    <p>Зазвичай відповідаємо протягом 1–2 годин у робочий час.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="fmodal-overlay" id="fmodal-pickup" onclick="FooterModal.closeAll(event)">
+        <div class="fmodal-box">
+            <button class="fmodal-close" onclick="FooterModal.close('pickup')">×</button>
+            <h3>Самовивіз</h3>
+            <div class="fmodal-content">
+                <div class="fmodal-item"><strong>Адреса</strong><p>вул. Нагірна, 16 · Київ</p></div>
+            </div>
+        </div>
+    </div>
+    <!-- Simple manager popup for blog -->
+    <div class="manager-popup" id="fmodal-manager">
+        <div class="mp-box">
+            <button class="mp-close" onclick="FooterModal.close('manager')">×</button>
+            <h4>Зв'язатися з нами</h4>
+            <br>
+            <div class="mp-field">
+                <label>Ім'я</label>
+                <input type="text" id="mgr-name" placeholder="Олександр">
+            </div>
+            <div class="mp-field">
+                <label>Телефон</label>
+                <input type="tel" id="mgr-phone" placeholder="+380">
+            </div>
+            <button class="mp-submit" onclick="FooterModal.submitForm(event)">Відправити</button>
+        </div>
+    </div>
+
+    <script src="products.js"></script>
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+
+    <script>
+        const articles = [
+            {
+                id: 1,
+                tag: 'Поради',
+                title: 'Як обрати свій перший чай: Практичний посібник',
+                excerpt: 'Початківцю легко загубитися в сотнях назв. Розповідаємо, на що реально звернути увагу при виборі...',
+                content: `
+                    <button class="article-back" onclick="closeArticle()">← Назад до списку</button>
+                    <div class="article-header">
+                        <span class="blog-tag">Вибір чаю</span>
+                        <h2>Як обрати свій перший чай: Практичний посібник</h2>
+                    </div>
+                    <div class="article-text">
+                        <p>Купівля чаю — це не лотерея, якщо розуміти основи. У <strong>jefeteastore</strong> ми завжди радимо починати з того, що вам зрозуміло. Не варто одразу купувати найдорожчий сорт, якщо ви ще не визначилися зі своїми смаковими вподобаннями.</p>
+                        <h3>Головні орієнтири для вибору</h3>
+                        <p>1. <strong>Смаковий профіль.</strong> Подумайте, що вам ближче: легкість та квіткові ноти (Світлі Улуни), насиченість горіхів та шоколаду (Темні Улуни) чи глибока "землянистість" та аромат дерева (Шу Пуери).</p>
+                        <p>2. <strong>Ефект від чаю.</strong> Кожен сорт має свій характер. Обирайте Шу Пуери для енергійного ранку, Світлі Улуни для натхнення вдень або ГАБА-чаї для фокусу та спокою у вечірній час.</p>
+                        <p>Починайте з невеликих порцій по декілька грамів, щоб спробувати якнайбільше варіантів і знайти свій фаворит.</p>
+                    </div>
+                `
+            },
+            {
+                id: 2,
+                tag: 'Знання',
+                title: 'Основні види китайського чаю та їх особливості',
+                excerpt: 'Короткий гід по головних категоріях: від світлих сортів до темних витриманих пуерів...',
+                content: `
+                    <button class="article-back" onclick="closeArticle()">← Назад до списку</button>
+                    <div class="article-header">
+                        <span class="blog-tag">Види чаю</span>
+                        <h2>Основні види китайського чаю та їх особливості</h2>
+                    </div>
+                    <div class="article-text">
+                        <p>Увесь справжній китайський чай робиться з однієї рослини — Camellia sinensis. Різниця лише в тому, як саме обробили листок. Ось головна класифікація, яку варто знати клієнтам <strong>jefeteastore</strong>:</p>
+                        <h3>Пуери (Шу та Шен)</h3>
+                        <p>Найзатребуваніша категорія. <strong>Шу Пуер</strong> — темний, "густий" чай з ароматом дерева та землі. Він проходить прискорену ферментацію і дуже м'яко п'ється. Шен Пуер — це "зелений" варіант, який з часом стає солодким та складним.</p>
+                        <h3>Улуни</h3>
+                        <p>Це "золота середина" між зеленим та чорним чаєм. Бувають світлі (квіткові, як Ті Гуань Інь) та темні (пряні та димні, як Да Хун Пао). Це чаї з неймовірним ароматом, який розкривається з кожним проливом.</p>
+                        <h3>ГАБА-чаї</h3>
+                        <p>Особливий вид чаю, що проходить ферментацію без доступу кисню. Це дозволяє зберегти корисні речовини, які допомагають нервовій системі краще справлятися зі стресом мегаполісів.</p>
+                    </div>
+                `
+            },
+            {
+                id: 3,
+                tag: 'Гайд',
+                title: 'Як правильно заварювати якісний чай вдома',
+                excerpt: 'Забудьте про складні церемонії. Проста покрокова інструкція для ідеальної чашки чаю...',
+                content: `
+                    <button class="article-back" onclick="closeArticle()">← Назад до списку</button>
+                    <div class="article-header">
+                        <span class="blog-tag">Заварка</span>
+                        <h2>Як правильно заварювати якісний чай вдома</h2>
+                    </div>
+                    <div class="article-text">
+                        <p>Ви придбали гарний чай у <strong>jefeteastore</strong>. Тепер важливо його не зіпсувати. Для ідеального результату достатньо дотримуватися декількох простих правил.</p>
+                        <h3>Покрокова інструкція</h3>
+                        <p>1. <strong>Вода.</strong> Це найважливіше. Тільки м'яка фільтрована або бутильована вода. Окріп прямо з крана знищить аромат будь-якого сорту.</p>
+                        <p>2. <strong>Температура.</strong> Не заливайте делікатні чаї окропом 100°. Світлий улун та ГАБА краще заварювати водою 80-85°, для темних улунів та пуерів підійде 90-95°.</p>
+                        <p>3. <strong>Посуд.</strong> Будь-який зручний чайник, гайвань або навіть звичайна чашка з ситом. Головне — добре прогріти його гарячою водою перед тим, як засипати туди чай.</p>
+                        <p>4. <strong>Промивка.</strong> Першу порцію води, якою залили чай, треба злити через 5-10 секунд. Це "промиває" листок від пилу та допомагає йому краще "прокинутися".</p>
+                    </div>
+                `
+            },
+            {
+                id: 4,
+                tag: 'Методи',
+                title: 'Від проливів до настоювання: Способи заварки',
+                excerpt: 'Чим відрізняється європейський метод від традиційного китайського проливу Пін Ча...',
+                content: `
+                    <button class="article-back" onclick="closeArticle()">← Назад до списку</button>
+                    <div class="article-header">
+                        <span class="blog-tag">Способи заварки</span>
+                        <h2>Від проливів до настоювання: Способи заварки</h2>
+                    </div>
+                    <div class="article-text">
+                        <p>Чай можна готувати по-різному, і результат буде відрізнятися. У <strong>jefeteastore</strong> ми радимо хоча б раз спробувати метод проливів.</p>
+                        <h3>Метод проливу (Пін Ча)</h3>
+                        <p>Це коли ви берете багато заварки (6-8 грамів на 150 мл) і робите дуже швидкі заварки по 10-30 секунд. Ви зливаєте настій у чашку, п’єте і знову заливаєте ті ж листки водою. Так чай розкривається поступово, змінюючи смак від першої чашки до восьмої.</p>
+                        <h3>Класичне настоювання</h3>
+                        <p>Звичний для нас метод: 3-5 грамів на великий чайник і очікування декількох хвилин. Це теж працює, але чай віддає всі свої речовини одразу, і ви не зможете насолодитися зміною його станів.</p>
+                        <p>Спробуйте обидва варіанти, щоб зрозуміти, який ритм вам сьогодні ближче.</p>
+                    </div>
+                `
+            },
+            {
+                id: 5,
+                tag: 'Культура',
+                title: 'Коротка історія виникнення основних сортів',
+                excerpt: 'Як звичайне листя на горі стало культовим напоєм: факти та історія сортів Пуер та Улун...',
+                content: `
+                    <button class="article-back" onclick="closeArticle()">← Назад до списку</button>
+                    <div class="article-header">
+                        <span class="blog-tag">Історія чаю</span>
+                        <h2>Користь та шлях: Коротка історія великих сортів</h2>
+                    </div>
+                    <div class="article-text">
+                        <p>Багато хто думає, що Пуер або Да Хун Пао — це назви окремих рослин. Насправді це результат багаторічної праці людей і навіть історичних випадковостей.</p>
+                        <h3>Народження Пуеру</h3>
+                        <p>Сотні років тому чай з провінції Юньнань перевозили на конях у далекі країни. Під час подорожі у вологому кліматі листя само собою проходило ферментацію. Так люди зрозуміли, що такий чай не тільки довше зберігається, а й стає кращим на смак.</p>
+                        <h3>Легенда Да Хун Пао</h3>
+                        <p>Назва перекладається як "Великий червоний халат". За історіями, колись цей чай допоміг вилікувати хворобу важливого чиновника, який у подяку накрив чайні кущі дорогими шовковими халатами. Відтоді скельний улун став символом якості та поваги.</p>
+                        <p>В <strong>jefeteastore</strong> ми цінуємо цю історію і намагаємося підбирати сорти, які зберігають традиційні технології виробництва.</p>
+                    </div>
+                `
+            }
+        ];
+
+        function renderArticles() {
+            const grid = document.getElementById('blog-grid');
+            grid.innerHTML = articles.map(art => `
+                <div class="blog-card" onclick="openArticle(${art.id})">
+                    <span class="blog-tag">${art.tag}</span>
+                    <h2 class="blog-title">${art.title}</h2>
+                    <p class="blog-excerpt">${art.excerpt}</p>
+                    <div class="blog-read-more">Читати статтю →</div>
+                </div>
+            `).join('');
+        }
+
+        function openArticle(id) {
+            const art = articles.find(a => a.id === id);
+            const view = document.getElementById('article-view');
+            const content = document.getElementById('article-content');
+            content.innerHTML = art.content;
+            view.style.display = 'block';
+            setTimeout(() => view.classList.add('active'), 20);
+            document.body.style.overflow = 'hidden';
+            window.scrollTo(0, 0);
+        }
+
+        function closeArticle() {
+            const view = document.getElementById('article-view');
+            view.classList.remove('active');
+            setTimeout(() => view.style.display = 'none', 400);
+            document.body.style.overflow = 'auto';
+        }
+
+        renderArticles();
+    </script>
+</body>
+</html>

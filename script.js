@@ -1,0 +1,935 @@
+/**
+ * JEFE TEASTORE - STABLE ENGINE v5
+ * Clean, logical, and mobile-ready.
+ */
+
+const State = {
+    db: [],
+    cart: [],
+    selectedVariant: null  // { grams: '100', price: 275 }
+};
+
+// --- TELEGRAM CONFIGURATION ---
+// Configuration is now pulled from config.js (excluded from Git)
+const TG_CONFIG = window.JEFE_CONFIG || {
+    token: '', // Put your new token in config.js
+    chatId: '', 
+    threads: { orders: 3, inquiries: 4, newsletter: 8 }
+};
+
+async function sendToTelegram(message, threadType = 'orders') {
+    if (!TG_CONFIG.token || TG_CONFIG.token.includes('ВАШ_')) {
+        console.warn("JEFE: Telegram token not configured.");
+        return;
+    }
+    
+    const threadId = TG_CONFIG.threads[threadType];
+    const url = `https://api.telegram.org/bot${TG_CONFIG.token}/sendMessage`;
+    
+    const payload = {
+        chat_id: TG_CONFIG.chatId,
+        text: message,
+        parse_mode: 'HTML',
+        message_thread_id: threadId
+    };
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        if (!response.ok) throw new Error('TG API Error');
+        console.log(`JEFE: Sent to Telegram (${threadType})`);
+    } catch (err) {
+        console.error("JEFE: Telegram delivery failed", err);
+    }
+}
+
+const UI = {
+    init() {
+        console.log("JEFE TEASTORE: Engine Ignition.");
+
+        // Restore cart from localStorage
+        const savedCart = localStorage.getItem('jefe_cart');
+        if (savedCart) {
+            try {
+                State.cart = JSON.parse(savedCart);
+            } catch(e) {
+                State.cart = [];
+            }
+        }
+
+        // Reset scroll position to top on refresh
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+        window.scrollTo(0, 0);
+        
+        // FCTA: Show bubble after 5s
+        setTimeout(() => this.toggleFcta(null, true), 5000);
+
+        // Data Sync Fallback
+        this.syncDatabase();
+    },
+
+    syncDatabase() {
+        // Checking both window.products and global products
+        const dbSource = window.products || (typeof products !== 'undefined' ? products : null);
+
+        if (dbSource && dbSource.length > 0) {
+            State.db = dbSource;
+            console.log(`JEFE TEASTORE: Data Synchronized. Entries: ${State.db.length}`);
+            this.buildUI();
+        } else {
+            console.warn("JEFE TEASTORE: Waiting for products.js to load...");
+            setTimeout(() => this.syncDatabase(), 100);
+        }
+    },
+
+    buildUI() {
+        this.renderProducts(); // Render 8 random first
+        this.renderCategories();
+        this.setupSplitText();
+        this.setupScrollEffects();
+        this.setupObservers();
+        this.setupMouseEffects();
+        
+        // Final reveal
+        setTimeout(() => {
+            document.body.classList.add('loaded');
+        }, 500);
+
+        // Initial animations
+        setTimeout(() => {
+            const title = document.querySelector('.hero-main-title');
+            if (title) {
+                title.classList.add('active');
+                title.addEventListener('animationend', () => {
+                    title.style.animation = 'none';
+                    title.style.opacity = '1';
+                }, { once: true });
+            }
+        }, 100);
+
+        // Initial cart sync
+        this.updateCartUI();
+    },
+
+    renderProducts(filter = 'all') {
+        const grid = document.getElementById('product-grid');
+        let items = [];
+
+        if (filter === 'all') {
+            // Get 8 random for the main screen
+            items = [...State.db].sort(() => 0.5 - Math.random()).slice(0, 8);
+        } else {
+            items = State.db.filter(p => p.category === filter);
+        }
+
+        if (items.length === 0) {
+            grid.innerHTML = `<div style="padding: 100px; opacity: 0.2; width: 100%; text-align: center;">На жаль, товарів у цій категорії немає.</div>`;
+            return;
+        }
+
+        grid.innerHTML = items.map(p => {
+            const imgSrc = (p.images && p.images[0]) || p.image || '';
+            const price = p.variants 
+                ? (p.variants['100'] || Object.values(p.variants)[0]) 
+                : (p.price || 0);
+
+            return `
+                <div class="card reveal" onclick="UI.openDetail(${p.id})">
+                    <div class="card-media">
+                        <img src="${imgSrc}" loading="lazy" alt="${p.name}">
+                    </div>
+                    <p class="card-cat">${p.category}</p>
+                    <div class="card-info">
+                        <h4 class="card-title">${p.name}</h4>
+                        <span class="card-price">${price}₴</span>
+                    </div>
+                    <button class="card-add-btn" onclick="UI.quickAdd(event, ${p.id})">Додати</button>
+                </div>
+            `;
+        }).join('');
+
+        // Re-observe new elements
+        this.setupObservers();
+    },
+
+    renderCategories() {
+        const list = document.getElementById('cat-list');
+        if (!list) return;
+        
+        list.innerHTML = `
+            <a href="index.html#collection" class="sidebar-link" onclick="UI.filterBy('all'); UI.toggleSidebar('cat', false)">Наші чаї</a>
+            <a href="blog.html" class="sidebar-link">Блог</a>
+            <a href="#" class="sidebar-link" onclick="UI.toggleSidebar('cat', false); FooterModal.open('contacts')">Контакти</a>
+        `;
+    },
+
+    // Map internal category keys to Ukrainian display names
+    categoryLabels: {
+        'all':      'Наші Чаї',
+        'Puerh':'Пуер',
+        'Oolong':   'Улун',
+        'Gaba':     'Габа',
+        'Sets':     'Набори',
+    },
+
+    updateSectionTitle(cat) {
+        const titleEl = document.getElementById('section-title');
+        if (!titleEl) return;
+        const label = this.categoryLabels[cat] || cat;
+        titleEl.innerHTML = `${label}<span style="color: var(--orange);">.</span>`;
+    },
+
+    filterBy(cat, tabEl) {
+        // Update active tab
+        document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+        if (tabEl) tabEl.classList.add('active');
+        else {
+            const match = document.querySelector(`.cat-tab[data-cat="${cat}"]`);
+            if (match) match.classList.add('active');
+        }
+
+        this.renderProducts(cat);
+        this.toggleSidebar('cat', false);
+        this.scrollTo('#collection');
+    },
+
+
+    toggleSidebar(type, open) {
+        const sidebar = document.getElementById(`${type}-sidebar`);
+        if (!sidebar) return;
+
+        sidebar.classList.toggle('active', open);
+        document.body.style.overflow = open ? 'hidden' : 'auto';
+
+        // Hide help button if cart is open
+        const fcta = document.getElementById('float-cta');
+        if (fcta) {
+            if (type === 'cart' && open) {
+                fcta.style.display = 'none';
+            } else if (type === 'cart' && !open) {
+                fcta.style.display = 'flex';
+            }
+        }
+    },
+
+    toggleSearch(open) {
+        const overlay = document.getElementById('search-overlay');
+        if (!overlay) return;
+        overlay.classList.toggle('active', open);
+        document.body.style.overflow = open ? 'hidden' : 'auto';
+        if (open) {
+            setTimeout(() => {
+                const input = document.getElementById('search-input');
+                if (input) input.focus();
+            }, 80);
+        } else {
+            const input = document.getElementById('search-input');
+            if (input) input.value = '';
+            document.getElementById('search-results').innerHTML = '';
+            document.getElementById('search-hint').style.display = '';
+        }
+    },
+
+    handleSearch(query) {
+        const resultsEl = document.getElementById('search-results');
+        const hintEl = document.getElementById('search-hint');
+        const q = query.trim().toLowerCase();
+
+        if (!q) {
+            resultsEl.innerHTML = '';
+            hintEl.style.display = '';
+            return;
+        }
+
+        hintEl.style.display = 'none';
+
+        const matches = State.db.filter(p =>
+            p.name.toLowerCase().includes(q) ||
+            p.category.toLowerCase().includes(q) ||
+            (p.description && p.description.toLowerCase().includes(q))
+        );
+
+        if (matches.length === 0) {
+            resultsEl.innerHTML = `<div class="search-no-results">Нічого не знайдено — спробуй інший запит</div>`;
+            return;
+        }
+
+        resultsEl.innerHTML = matches.slice(0, 8).map(p => {
+            const imgSrc = (p.images && p.images[0]) || p.image || '';
+            const price = p.variants
+                ? (p.variants['100'] || Object.values(p.variants)[0])
+                : (p.price || 0);
+            // Highlight matching text
+            const regex = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+            const highlightedName = p.name.replace(regex, '<mark style="background:var(--orange);color:#000;border-radius:2px;padding:0 2px;">$1</mark>');
+            return `
+                <div class="search-result-item" onclick="UI.openDetailFromSearch(${p.id})">
+                    <img class="search-result-img" src="${imgSrc}" alt="${p.name}" loading="lazy">
+                    <div class="search-result-info">
+                        <div class="search-result-name">${highlightedName}</div>
+                        <div class="search-result-cat">${p.category}</div>
+                    </div>
+                    <span class="search-result-price">${price}₴</span>
+                </div>
+            `;
+        }).join('');
+    },
+
+    openDetailFromSearch(id) {
+        this.toggleSearch(false);
+        setTimeout(() => this.openDetail(id), 200);
+    },
+
+    setupMouseEffects() {
+        const glow = document.querySelector('.mesh-glow');
+        const cursor = document.querySelector('.cursor');
+
+        window.addEventListener('mousemove', (e) => {
+            const { clientX, clientY } = e;
+            
+            // Cursor Position
+            if (cursor) {
+                cursor.style.left = `${clientX}px`;
+                cursor.style.top = `${clientY}px`;
+            }
+
+            // Mesh Glow
+            if (glow) {
+                const x = (clientX / window.innerWidth) * 100;
+                const y = (clientY / window.innerHeight) * 100;
+                glow.style.setProperty('--x', `${x}%`);
+                glow.style.setProperty('--y', `${y}%`);
+            }
+        });
+
+        // Hover Effect
+        document.body.addEventListener('mouseover', (e) => {
+            const target = e.target.closest('button, a, .card, .cat-pill');
+            if (target) cursor?.classList.add('hover');
+        });
+        document.body.addEventListener('mouseout', (e) => {
+            const target = e.target.closest('button, a, .card, .cat-pill');
+            if (target) cursor?.classList.remove('hover');
+        });
+    },
+
+    // Normalize description: trim to first ~200 chars, end on word/sentence
+    normalizeDescription(text) {
+        const fallback = 'Традиційний китайський чай, зібраний колективом JEFE. Натуральний смак, відсутність добавок.';
+        if (!text) return fallback;
+        const clean = text.trim().replace(/\s+/g, ' ');
+        if (clean.length <= 200) return clean;
+        // Cut at last sentence boundary before 200 chars
+        const cut = clean.slice(0, 200);
+        const lastDot = cut.lastIndexOf('.');
+        const lastComma = cut.lastIndexOf(',');
+        const boundary = lastDot > 150 ? lastDot + 1 : (lastComma > 150 ? lastComma + 1 : 200);
+        return clean.slice(0, boundary).trim();
+    },
+
+    openDetail(id) {
+        const p = State.db.find(x => x.id === id);
+        if (!p) return;
+
+        State.selectedVariant = null;
+
+        const modal = document.getElementById('product-detail');
+        const container = document.getElementById('detail-content');
+
+        // ── Images ──────────────────────────────────────────
+        const images = (p.images && p.images.length > 0) ? p.images : (p.image ? [p.image] : []);
+        const hasMultiple = images.length > 1;
+
+        const sliderHtml = images.length === 0
+            ? `<div class="detail-no-img"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`
+            : `<div class="img-slider" id="img-slider-${id}">
+                    <div class="img-slider-track" id="img-track-${id}">
+                        ${images.map((src, i) => `
+                            <div class="img-slide">
+                                <img src="${src}" alt="${p.name} ${i+1}" loading="${i === 0 ? 'eager' : 'lazy'}">
+                            </div>`).join('')}
+                    </div>
+                    ${hasMultiple ? `
+                        <button class="img-slider-btn img-slider-prev" onclick="UI.slideImg('${id}', -1)" aria-label="Попереднє">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                        </button>
+                        <button class="img-slider-btn img-slider-next" onclick="UI.slideImg('${id}', 1)" aria-label="Наступне">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                        </button>
+                        <div class="img-slider-dots" id="img-dots-${id}">
+                            ${images.map((_, i) => `<button class="img-dot${i===0?' active':''}" onclick="UI.goToSlide('${id}', ${i})"></button>`).join('')}
+                        </div>
+                        <div class="img-slider-thumbs" id="img-thumbs-${id}">
+                            ${images.map((src, i) => `
+                                <div class="img-thumb${i===0?' active':''}" onclick="UI.goToSlide('${id}', ${i})">
+                                    <img src="${src}" alt="thumb ${i+1}" loading="lazy">
+                                </div>`).join('')}
+                        </div>` : ''}
+                </div>`;
+
+        // ── Variants ────────────────────────────────────────
+        const weights = p.variants ? Object.keys(p.variants).sort((a, b) => Number(a) - Number(b)) : [];
+        const initialPrice = weights.length > 0
+            ? (p.variants[weights.includes('100') ? '100' : weights[0]])
+            : p.price;
+
+        const variantsHtml = weights.length > 0 ? `
+            <div class="dp-block">
+                <div class="detail-variants" id="detail-variants">
+                    ${weights.map(w => `
+                        <button class="weight-btn" data-grams="${w}" data-price="${p.variants[w]}"
+                            onclick="UI.selectVariant(${id}, '${w}', ${p.variants[w]})"
+                        >${w}г</button>`).join('')}
+                </div>
+            </div>` : '';
+
+        // ── Origin ──────────────────────────────────────────
+        const originHtml = p.origin ? `
+            <div class="dp-origin">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                ${p.origin}
+            </div>` : '';
+
+        // ── Brew guide ──────────────────────────────────────
+        const brew = p.brew || {};
+        const brewItems = [
+            brew.temp   && { icon: '🌡', label: 'Температура', value: `${brew.temp}°C` },
+            brew.time   && { icon: '⏱', label: 'Перший злив', value: `${brew.time} сек` },
+            brew.amount && { icon: '⚖', label: 'Заварка', value: brew.amount },
+            brew.steeps && { icon: '♾', label: 'Зливів', value: brew.steeps },
+        ].filter(Boolean);
+
+        const brewHtml = brewItems.length > 0 ? `
+            <div class="dp-block dp-brew-block">
+                <div class="dp-label">Заварювання</div>
+                <div class="dp-brew-grid">
+                    ${brewItems.map(item => `
+                        <div class="dp-brew-card">
+                            <span class="dp-brew-icon">${item.icon}</span>
+                            <span class="dp-brew-value">${item.value}</span>
+                            <span class="dp-brew-label">${item.label}</span>
+                        </div>`).join('')}
+                </div>
+                ${brew.notes ? `<p class="dp-brew-notes">${brew.notes}</p>` : ''}
+            </div>` : '';
+
+        // ── Description ─────────────────────────────────────
+        const desc = p.description || 'Традиційний китайський чай, зібраний колективом JEFE.';
+
+        // ── Final HTML ──────────────────────────────────────
+        container.innerHTML = `
+            <div class="detail-container detail-container--v2">
+                <div class="detail-media">
+                    ${sliderHtml}
+                </div>
+                <div class="detail-info--v2">
+                    <div class="dp-content-top">
+                        <div class="dp-top">
+                            <div class="dp-meta">
+                                <span class="dp-cat">${p.category}</span>
+                                ${originHtml}
+                            </div>
+                            <h2 class="dp-name">${p.name}</h2>
+                            <p class="dp-desc">${desc}</p>
+                        </div>
+                        ${brewHtml}
+                    </div>
+
+                    <div class="dp-content-bottom">
+                         ${variantsHtml}
+                         <div class="dp-price-wrap">
+                             <div class="detail-price" id="detail-price">${initialPrice}₴</div>
+                         </div>
+                         <div class="dp-purchase">
+                             <button class="btn-buy" onclick="UI.addToCart(${p.id})">
+                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+                                 Додати в кошик
+                             </button>
+                         </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+
+        // ── Slider state ─────────────────────────────────────
+        State.sliderIndex = 0;
+        State.sliderId = String(id);
+        State.sliderTotal = images.length;
+        this._initSliderSwipe(id);
+
+        // ── Auto-select variant ──────────────────────────────
+        if (weights.length > 0) {
+            const defaultW = weights.includes('100') ? '100' : weights[0];
+            this.selectVariant(id, defaultW, p.variants[defaultW]);
+        }
+
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    },
+
+
+
+    slideImg(id, dir) {
+        const total = State.sliderTotal;
+        if (!total || total <= 1) return;
+        State.sliderIndex = (State.sliderIndex + dir + total) % total;
+        this.goToSlide(id, State.sliderIndex);
+    },
+
+    goToSlide(id, idx) {
+        State.sliderIndex = idx;
+        const track = document.getElementById(`img-track-${id}`);
+        if (track) track.style.transform = `translateX(-${idx * 100}%)`;
+
+        document.querySelectorAll(`#img-dots-${id} .img-dot`).forEach((d, i) =>
+            d.classList.toggle('active', i === idx));
+        document.querySelectorAll(`#img-thumbs-${id} .img-thumb`).forEach((t, i) =>
+            t.classList.toggle('active', i === idx));
+    },
+
+    _initSliderSwipe(id) {
+        const slider = document.getElementById(`img-slider-${id}`);
+        if (!slider || State.sliderTotal <= 1) return;
+        let startX = 0;
+        slider.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
+        slider.addEventListener('touchend', e => {
+            const diff = startX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 40) this.slideImg(id, diff > 0 ? 1 : -1);
+        }, { passive: true });
+    },
+
+
+
+    selectVariant(id, grams, price) {
+        State.selectedVariant = { grams, price };
+        // Update price display
+        const priceEl = document.getElementById('detail-price');
+        if (priceEl) priceEl.textContent = `${price}₴`;
+        // Highlight active button
+        document.querySelectorAll('.weight-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.grams === String(grams));
+        });
+    },
+
+    quickAdd(e, id) {
+        e.stopPropagation();
+        const p = State.db.find(x => x.id === id);
+        if (p) {
+            let grams = '';
+            let price = p.price || 0;
+            if (p.variants) {
+                grams = Object.keys(p.variants).includes('100') ? '100' : Object.keys(p.variants)[0];
+                price = p.variants[grams];
+            }
+            
+            this.addToCartManual({ 
+                id: p.id, 
+                name: p.name, 
+                price, 
+                grams, 
+                image: (p.images ? p.images[0] : p.image) 
+            });
+            this.toast(`${p.name} додано у кошик`);
+        }
+    },
+
+    closeDetail() {
+        document.getElementById('product-detail').classList.remove('active');
+        document.body.style.overflow = 'auto';
+    },
+
+    addToCart(id) {
+        const p = State.db.find(x => x.id === id);
+        if (p) {
+            this.addToCartManual({
+                id: p.id,
+                name: p.name,
+                category: p.category,
+                price: State.selectedVariant ? State.selectedVariant.price : p.price,
+                grams: State.selectedVariant ? State.selectedVariant.grams : (p.weight || null),
+                image: (p.images ? p.images[0] : p.image)
+            });
+            this.toggleSidebar('cart', true);
+            this.closeDetail();
+        }
+    },
+
+    addToCartManual(item) {
+        const existing = State.cart.find(x => x.id === item.id && x.grams === item.grams);
+        if (existing) {
+            existing.qty = (existing.qty || 1) + 1;
+        } else {
+            item.qty = 1;
+            State.cart.push(item);
+        }
+        this.updateCartUI();
+        localStorage.setItem('jefe_cart', JSON.stringify(State.cart));
+    },
+
+    updateCartUI() {
+        const container = document.getElementById('cart-items');
+        const checkoutBtnBlock = document.getElementById('cart-footer-block');
+        if (!container) return;
+
+        if (State.cart.length === 0) {
+            container.innerHTML = `
+                <div style="text-align: center; margin-top: 60px;">
+                    <p style="font-size: 1.25rem; margin-bottom: 30px; color: rgba(255,255,255,0.85); font-weight: 600;">Ваш кошик ще порожній</p>
+                    <button class="btn-checkout" onclick="UI.toggleSidebar('cart', false); UI.scrollTo('#collection');" 
+                            style="background: #ff5a00; color: #000; border-radius: 14px; padding: 18px 40px; font-weight: 900; border: none; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; box-shadow: 0 4px 30px rgba(255, 90, 0, 0.6); transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);">
+                        Перейти до каталогу
+                    </button>
+                </div>
+            `;
+            if (checkoutBtnBlock) checkoutBtnBlock.style.display = 'none';
+        } else {
+            container.innerHTML = State.cart.map((item, idx) => `
+                <div class="cart-item" style="display: flex; gap: 15px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border); align-items: center;">
+                    <img src="${item.image}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 12px; background: #1a1a1a;">
+                    <div style="flex: 1;">
+                        <div style="font-weight: 900; font-size: 1.05rem; margin-bottom: 3px;">${item.name}</div>
+                        <div style="opacity: 0.5; font-size: 0.85rem;">
+                            ${item.grams ? item.grams + 'г' : ''} 
+                            ${item.qty > 1 ? '<span style="color: var(--orange); margin-left: 5px; font-weight: 800;">x' + item.qty + '</span>' : ''}
+                        </div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
+                        <button onclick="UI.removeFromCart(${idx})" style="background: none; border: none; color: #ff5e5e; cursor: pointer; font-size: 1.1rem; opacity: 0.6;">&times;</button>
+                        <div style="font-weight: 900; font-size: 1.15rem; letter-spacing: -0.5px;">${item.price * (item.qty || 1)}₴</div>
+                    </div>
+                </div>
+            `).join('');
+            if (checkoutBtnBlock) checkoutBtnBlock.style.display = 'block';
+        }
+
+        const total = State.cart.reduce((acc, curr) => acc + (curr.price * (curr.qty || 1)), 0);
+        const totalEl = document.getElementById('cart-total');
+        if (totalEl) totalEl.innerText = `${total}₴`;
+
+        const badge = document.getElementById('cart-qty');
+        if (badge) badge.innerText = State.cart.length;
+    },
+
+    removeFromCart(index) {
+        State.cart.splice(index, 1);
+        this.updateCartUI();
+        localStorage.setItem('jefe_cart', JSON.stringify(State.cart));
+    },
+
+    scrollTo(selector) {
+        document.querySelector(selector).scrollIntoView({ behavior: 'smooth' });
+    },
+
+    setupSplitText() {
+        // Removed as per request to make title static
+    },
+
+    setupScrollEffects() {
+        window.addEventListener('scroll', () => {
+            const scroll = window.scrollY;
+            const heroTitle = document.querySelector('.hero-main-title');
+            if (heroTitle) {
+                // Return the beautiful slide-up scrolling parallax
+                heroTitle.style.transform = `translateY(${Math.max(-200, scroll * 0.4)}px)`;
+                heroTitle.style.opacity = Math.max(0, 1 - (scroll / 600));
+            }
+
+            // Hide scroll indicator after user starts scrolling
+            const scrollIndicator = document.getElementById('scroll-indicator');
+            if (scrollIndicator) {
+                scrollIndicator.classList.toggle('hidden', scroll > 80);
+            }
+        });
+    },
+
+    setupObservers() {
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+    },
+
+    checkout() {
+        if (State.cart.length === 0) return;
+        this.toggleCheckout(true);
+    },
+
+    toggleCheckout(open, e) {
+        if (e && e.target !== e.currentTarget) return;
+        const modal = document.getElementById('checkout-modal');
+        if (!modal) return;
+
+        modal.classList.toggle('active', open);
+        document.body.style.overflow = open ? 'hidden' : 'auto';
+
+        if (open) {
+            this.toggleSidebar('cart', false);
+            // Update total in checkout
+            const sum = State.cart.reduce((acc, curr) => acc + curr.price, 0);
+            document.getElementById('co-total').innerText = `${sum}₴`;
+        }
+    },
+
+    onDeliveryTypeChange(type) {
+        const pickupInfo = document.getElementById('co-pickup-info');
+        const deliveryOpts = document.getElementById('co-delivery-options');
+        
+        if (type === 'pickup') {
+            pickupInfo.style.display = 'block';
+            deliveryOpts.style.display = 'none';
+        } else {
+            pickupInfo.style.display = 'none';
+            deliveryOpts.style.display = 'block';
+        }
+    },
+
+    onCourierChange(type) {
+        const npFields = document.getElementById('co-np-fields');
+        const taxiFields = document.getElementById('co-taxi-fields');
+        
+        if (type === 'np') {
+            npFields.style.display = 'block';
+            taxiFields.style.display = 'none';
+        } else {
+            npFields.style.display = 'none';
+            taxiFields.style.display = 'block';
+        }
+    },
+
+    handleCheckoutSubmit(e) {
+        e.preventDefault();
+        
+        const phoneInput = document.getElementById('co-phone').value.trim();
+        if (!phoneInput.startsWith('+380')) {
+            alert('Будь ласка, введіть коректний номер телефону, що починається з +380');
+            return;
+        }
+
+        const data = {
+            name: document.getElementById('co-name').value,
+            phone: phoneInput,
+            email: document.getElementById('co-email').value,
+            deliveryType: document.querySelector('input[name="delivery-type"]:checked').value,
+            comment: document.getElementById('co-comment').value,
+            items: State.cart,
+            total: State.cart.reduce((acc, curr) => acc + curr.price, 0)
+        };
+
+        if (data.deliveryType === 'delivery') {
+            data.courierType = document.querySelector('input[name="courier-type"]:checked').value;
+            if (data.courierType === 'np') {
+                data.npCity = document.getElementById('co-np-city').value;
+                data.npBranch = document.getElementById('co-np-branch').value;
+                if (!data.npCity || !data.npBranch) {
+                    alert('Будь ласка, заповніть дані для Нової Пошти');
+                    return;
+                }
+            } else {
+                data.taxiAddress = document.getElementById('co-taxi-address').value;
+                if (!data.taxiAddress) {
+                    alert('Будь ласка, вкажіть адресу для таксі');
+                    return;
+                }
+            }
+        }
+
+        console.log('Order submitted:', data);
+
+        // --- Telegram Integration ---
+        let itemsList = data.items.map(item => 
+            `▫️ <b>${item.name}</b> ${item.grams ? `(${item.grams}г)` : ''} x${item.qty} — ${item.price * item.qty}₴`
+        ).join('\n');
+
+        let deliveryInfo = data.deliveryType === 'pickup' 
+            ? '🏪 <b>Самовивіз</b> (Нагірна)'
+            : `🚚 <b>Доставка:</b> ${data.courierType === 'np' ? 'Нова Пошта' : 'Таксі'}\n` +
+              (data.courierType === 'np' 
+                ? `📍 Мiсто: ${data.npCity}\n🏢 Вiддiлення: ${data.npBranch}` 
+                : `🏠 Адреса: ${data.taxiAddress}`);
+
+        const message = `
+📦 <b>НОВЕ ЗАМОВЛЕННЯ</b>
+
+👤 <b>Клієнт:</b> ${data.name}
+📞 <b>Телефон:</b> <code>${data.phone}</code>
+📧 <b>Email:</b> ${data.email || '—'}
+
+🛍 <b>Товари:</b>
+${itemsList}
+
+💰 <b>Разом:</b> <b>${data.total}₴</b>
+
+---
+${deliveryInfo}
+
+💬 <b>Коментар:</b> ${data.comment || '—'}
+        `.trim();
+
+        sendToTelegram(message, 'orders');
+        
+        // Success feedback
+        alert(`Дякую, ${data.name}! Замовлення на суму ${data.total}₴ отримано. Ми зв'яжемося з вами найближчим часом.🍵`);
+        
+        State.cart = [];
+        localStorage.removeItem('jefe_cart');
+        this.updateCartUI();
+        this.toggleCheckout(false);
+    },
+
+    toggleFcta(e, show) {
+        if (e) e.stopPropagation();
+        const fcta = document.getElementById('float-cta');
+        if (!fcta) return;
+        
+        if (show) {
+            fcta.classList.remove('collapsed');
+            
+            // Auto-hide after 10s if not interacted
+            if (this._fctaTimer) clearTimeout(this._fctaTimer);
+            this._fctaTimer = setTimeout(() => {
+                this.toggleFcta(null, false);
+            }, 10000);
+
+            // Hide on scroll or global click
+            const hideHandler = () => {
+                this.toggleFcta(null, false);
+                window.removeEventListener('scroll', hideHandler);
+                document.removeEventListener('mousedown', hideHandler);
+            };
+            
+            // Wait a tiny bit to prevent instant hide
+            setTimeout(() => {
+                window.addEventListener('scroll', hideHandler, { once: true });
+                document.addEventListener('mousedown', (e) => {
+                    if (!fcta.contains(e.target)) hideHandler();
+                }, { once: true });
+            }, 500);
+
+        } else {
+            fcta.classList.add('collapsed');
+            if (this._fctaTimer) clearTimeout(this._fctaTimer);
+        }
+    },
+
+    handleFctaClick() {
+        const fcta = document.getElementById('float-cta');
+        if (!fcta) return;
+        
+        if (fcta.classList.contains('collapsed')) {
+            this.toggleFcta(null, true);
+        } else {
+            FooterModal.open('manager');
+        }
+    },
+
+    toggleMessengerOptions(show) {
+        const el = document.getElementById('messenger-sub-options');
+        if (el) el.style.display = show ? 'block' : 'none';
+    }
+};
+
+document.addEventListener('DOMContentLoaded', () => UI.init());
+
+// Keyboard: Escape + slider arrow navigation
+document.addEventListener('keydown', (e) => {
+    const detailActive = document.getElementById('product-detail')?.classList.contains('active');
+    const searchActive = document.getElementById('search-overlay')?.classList.contains('active');
+
+    if (e.key === 'Escape') {
+        if (searchActive) UI.toggleSearch(false);
+        FooterModal.closeAll();
+    }
+
+    // Arrow keys navigate slider when detail modal is open
+    if (detailActive && !searchActive && State.sliderId) {
+        if (e.key === 'ArrowLeft')  UI.slideImg(State.sliderId, -1);
+        if (e.key === 'ArrowRight') UI.slideImg(State.sliderId, 1);
+    }
+});
+
+// ── Footer Modals ─────────────────────────────────────────────
+
+const FooterModal = {
+    _ids: ['delivery', 'returns', 'pickup', 'contacts', 'manager'],
+
+    open(name) {
+        this.closeAll();
+        const el = document.getElementById(`fmodal-${name}`);
+        if (el) {
+            el.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+    },
+
+    close(name) {
+        const el = document.getElementById(`fmodal-${name}`);
+        if (el) el.classList.remove('active');
+        document.body.style.overflow = '';
+    },
+
+    closeAll(e) {
+        // If triggered by overlay click, only close if clicked the overlay itself
+        if (e && e.target !== e.currentTarget) return;
+        this._ids.forEach(id => {
+            const el = document.getElementById(`fmodal-${id}`);
+            if (el) el.classList.remove('active');
+        });
+        document.body.style.overflow = '';
+    },
+
+    submitForm(e) {
+        e.preventDefault();
+        const question = document.getElementById('mgr-question').value.trim();
+        const phone    = document.getElementById('mgr-phone').value.trim();
+        if (!question || !phone) return;
+
+        // --- Telegram Integration ---
+        const message = `
+❓ <b>НОВЕ ЗВЕРНЕННЯ</b>
+
+📞 <b>Телефон:</b> <code>${phone}</code>
+💬 <b>Питання:</b>
+${question}
+        `.trim();
+
+        sendToTelegram(message, 'inquiries');
+
+        // Reset + close
+        document.getElementById('mgr-question').value = '';
+        document.getElementById('mgr-phone').value = '';
+        this.close('manager');
+
+        // Show success toast via UI
+        if (typeof UI !== 'undefined' && UI.toast) {
+            UI.toast('Повідомлення надіслано! Ми зв\'яжемося з вами 🍵');
+        }
+    }
+};
+
+const Marketing = {
+    handleNewsletter(e) {
+        e.preventDefault();
+        const email = document.getElementById('news-email').value.trim();
+        if (!email) return;
+
+        const message = `📬 <b>НОВА ПІДПИСКА</b>\n\nEmail: <code>${email}</code>`;
+        sendToTelegram(message, 'newsletter');
+
+        document.getElementById('news-email').value = '';
+        if (typeof UI !== 'undefined' && UI.toast) {
+            UI.toast('Дякуємо за підписку! 🍵');
+        }
+    }
+};
+
