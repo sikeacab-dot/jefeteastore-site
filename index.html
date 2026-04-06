@@ -65,6 +65,7 @@
             <div class="dropdown">
                 <button class="nav-btn dropdown-btn">Каталог</button>
                 <div class="dropdown-content">
+                    <a href="index.html">Головна</a>
                     <a href="#collection" onclick="UI.filterBy('all')">Наші чаї</a>
                     <a href="blog.html">Блог</a>
                     <a href="#" onclick="FooterModal.open('contacts')">Контакти</a>
@@ -102,7 +103,7 @@
         <!-- Catalog Section -->
         <section class="collection" id="collection">
             <div class="section-head">
-                <h2 class="section-title">Наші Чаї<span style="color: var(--orange);">.</span></h2>
+                <h2 class="section-title">Наші Чаї</h2>
                 <!-- Category filter tabs -->
                 <div class="cat-filter-tabs" id="cat-filter-tabs">
                     <button class="cat-tab active" data-cat="all" onclick="UI.filterBy('all', this)">Всі</button>
@@ -400,21 +401,21 @@
     <div id="cart-sidebar" class="sidebar">
         <div class="sidebar-overlay" onclick="UI.toggleSidebar('cart', false)"></div>
         <div class="sidebar-content">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 40px;">
-                <h3 style="font-family: var(--font-body); font-weight: 900; font-size: 2rem;">Кошик</h3>
-                <button class="nav-btn" onclick="UI.toggleSidebar('cart', false)" style="font-size: 1.5rem;">&times;</button>
+            <div class="sidebar-header">
+                <h3>Кошик</h3>
+                <button class="nav-btn" onclick="UI.toggleSidebar('cart', false)">&times;</button>
             </div>
-            <div id="cart-items" style="flex: 1; overflow-y: auto;">
+            <div id="cart-items" class="sidebar-body">
                 <!-- Cart items -->
             </div>
-            <div id="cart-footer-block" style="padding-top: 30px; border-top: 1px solid var(--border);">
-                <div style="display: flex; justify-content: space-between; font-size: 1.5rem; margin-bottom: 25px;">
+            <div id="cart-footer-block" class="sidebar-footer">
+                <div class="sidebar-total">
                     <span>Всього</span>
-                    <span id="cart-total" style="font-weight: 900; color: var(--orange);">0₴</span>
+                    <span id="cart-total">0₴</span>
                 </div>
                 <div class="cart-actions-vertical">
                     <button class="btn-continue-white" onclick="UI.toggleSidebar('cart', false)">Продовжити покупки</button>
-                    <button class="btn-checkout-orange" onclick="UI.checkout()">Оформити замовлення</button>
+                    <button class="btn-checkout-white" onclick="UI.checkout()">Оформити замовлення</button>
                 </div>
             </div>
         </div>
@@ -447,12 +448,15 @@
         </div>
     </div>
 
-    <!-- Checkout Modal -->
-    <div id="checkout-modal" class="fmodal-overlay" onclick="UI.toggleCheckout(false, event)">
-        <div class="fmodal-box checkout-box">
-            <button class="fmodal-close" onclick="UI.toggleCheckout(false)">&times;</button>
-            <div class="fmodal-icon" style="font-size: 2.5rem; margin-bottom: 10px;">🛒</div>
-            <h3>Оформлення замовлення</h3>
+    <!-- Checkout Sidebar -->
+    <div id="checkout-sidebar" class="sidebar">
+        <div class="sidebar-overlay" onclick="UI.toggleCheckout(false)"></div>
+        <div class="sidebar-content">
+            <div class="sidebar-header">
+                <h3>Оформити</h3>
+                <button class="nav-btn" onclick="UI.toggleCheckout(false)">&times;</button>
+            </div>
+            <div class="sidebar-body">
             
             <form id="checkout-form" onsubmit="UI.handleCheckoutSubmit(event)">
                 <div class="checkout-fields">
@@ -536,11 +540,17 @@
                     </div>
                 </div>
 
-                <div class="checkout-footer">
-                    <div class="checkout-total">Сума: <span id="co-total">0₴</span></div>
-                    <button type="submit" class="btn-submit-order">Підтвердити замовлення</button>
+            </div>
+            <div class="sidebar-footer">
+                <div class="sidebar-total">
+                    <span>До сплати</span>
+                    <span id="co-total">0₴</span>
                 </div>
-            </form>
+                <div class="cart-actions-vertical">
+                    <button type="button" class="btn-continue-white" onclick="UI.toggleCheckout(false)">Назад до кошика</button>
+                    <button type="submit" form="checkout-form" class="btn-checkout-white">Підтвердити замовлення</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -551,7 +561,7 @@
             <h3 class="added-title">Товар додано до кошику</h3>
             <div class="added-actions">
                 <button class="btn-continue-white" onclick="UI.closeAddedPopup('continue')">Продовжити покупки</button>
-                <button class="btn-checkout-orange" onclick="UI.closeAddedPopup('checkout')">Оформити замовлення</button>
+                <button class="btn-checkout-white" onclick="UI.closeAddedPopup('checkout')">Оформити замовлення</button>
             </div>
         </div>
     </div>

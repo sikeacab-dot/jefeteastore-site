@@ -213,14 +213,14 @@ const UI = {
         if (!sidebar) return;
 
         sidebar.classList.toggle('active', open);
-        document.body.style.overflow = open ? 'hidden' : 'auto';
+        document.body.classList.toggle('no-scroll', open);
     },
 
     toggleSearch(open) {
         const overlay = document.getElementById('search-overlay');
         if (!overlay) return;
         overlay.classList.toggle('active', open);
-        document.body.style.overflow = open ? 'hidden' : 'auto';
+        document.body.classList.toggle('no-scroll', open);
         if (open) {
             setTimeout(() => {
                 const input = document.getElementById('search-input');
@@ -478,7 +478,7 @@ const UI = {
         }
 
         modal.classList.add('active');
-        document.body.style.overflow = 'hidden';
+        document.body.classList.add('no-scroll');
     },
 
 
@@ -527,7 +527,7 @@ const UI = {
 
     closeDetail() {
         document.getElementById('product-detail').classList.remove('active');
-        document.body.style.overflow = 'auto';
+        document.body.classList.remove('no-scroll');
     },
 
     addToCart(id) {
@@ -587,18 +587,24 @@ const UI = {
             if (checkoutBtnBlock) checkoutBtnBlock.style.display = 'none';
         } else {
             container.innerHTML = State.cart.map((item, idx) => `
-                <div class="cart-item" style="display: flex; gap: 15px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border); align-items: center;">
+                <div class="cart-item" style="display: flex; gap: 15px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.06); align-items: center;">
                     <img src="${item.image}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 12px; background: #1a1a1a;">
                     <div style="flex: 1;">
                         <div style="font-weight: 900; font-size: 1.05rem; margin-bottom: 3px;">${item.name}</div>
-                        <div style="opacity: 0.5; font-size: 0.85rem;">
-                            ${item.grams ? item.grams + 'г' : ''} 
-                            ${item.qty > 1 ? '<span style="color: var(--orange); margin-left: 5px; font-weight: 800;">x' + item.qty + '</span>' : ''}
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="opacity: 0.8; font-size: 0.85rem; color: #fff;">
+                                ${item.grams ? item.grams + 'г' : ''} 
+                                <span style="font-weight: 800; margin-left: 5px;">x${item.qty || 1}</span>
+                            </div>
+                            <div style="display: flex; gap: 6px;">
+                                <button onclick="UI.updateQty(${idx}, -1)" style="width: 24px; height: 24px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #fff; cursor: pointer; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; font-weight: 900;">–</button>
+                                <button onclick="UI.updateQty(${idx}, 1)" style="width: 24px; height: 24px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #fff; cursor: pointer; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; font-weight: 900;">+</button>
+                            </div>
                         </div>
                     </div>
                     <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
                         <button onclick="UI.removeFromCart(${idx})" style="background: none; border: none; color: #ff5e5e; cursor: pointer; font-size: 1.1rem; opacity: 0.6;">&times;</button>
-                        <div style="font-weight: 900; font-size: 1.15rem; letter-spacing: -0.5px;">${item.price * (item.qty || 1)}₴</div>
+                        <div style="font-weight: 900; font-size: 1.15rem; letter-spacing: -0.5px; color: #fff;">${Number(item.price) * (item.qty || 1)}₴</div>
                     </div>
                 </div>
             `).join('');
@@ -625,6 +631,19 @@ const UI = {
         State.cart.splice(index, 1);
         this.updateCartUI();
         localStorage.setItem('jefe_cart', JSON.stringify(State.cart));
+    },
+
+    updateQty(index, delta) {
+        const item = State.cart[index];
+        if (!item) return;
+        
+        item.qty = (item.qty || 1) + delta;
+        if (item.qty <= 0) {
+            this.removeFromCart(index);
+        } else {
+            localStorage.setItem('jefe_cart', JSON.stringify(State.cart));
+            this.updateCartUI();
+        }
     },
 
     scrollTo(selector) {
@@ -687,11 +706,11 @@ const UI = {
 
     toggleCheckout(open, e) {
         if (e && e.target !== e.currentTarget) return;
-        const modal = document.getElementById('checkout-modal');
+        const modal = document.getElementById('checkout-sidebar');
         if (!modal) return;
 
         modal.classList.toggle('active', open);
-        document.body.style.overflow = open ? 'hidden' : 'auto';
+        document.body.classList.toggle('no-scroll', open);
 
         if (open) {
             this.toggleSidebar('cart', false);
