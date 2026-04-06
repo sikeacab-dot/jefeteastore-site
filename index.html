@@ -408,11 +408,14 @@
                 <!-- Cart items -->
             </div>
             <div id="cart-footer-block" style="padding-top: 30px; border-top: 1px solid var(--border);">
-                <div style="display: flex; justify-content: space-between; font-size: 1.8rem; margin-bottom: 20px;">
-                    <span>Сума</span>
-                    <span id="cart-total">0₴</span>
+                <div style="display: flex; justify-content: space-between; font-size: 1.5rem; margin-bottom: 25px;">
+                    <span>Всього</span>
+                    <span id="cart-total" style="font-weight: 900; color: var(--orange);">0₴</span>
                 </div>
-                <button class="btn-checkout" onclick="UI.checkout()">Оформити замовлення</button>
+                <div class="cart-actions-vertical">
+                    <button class="btn-continue-white" onclick="UI.toggleSidebar('cart', false)">Продовжити покупки</button>
+                    <button class="btn-checkout-orange" onclick="UI.checkout()">Оформити замовлення</button>
+                </div>
             </div>
         </div>
     </div>
@@ -538,6 +541,18 @@
                     <button type="submit" class="btn-submit-order">Підтвердити замовлення</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Added to Cart Popup -->
+    <div id="added-popup" class="fmodal-overlay added-popup">
+        <div class="added-box">
+            <div class="added-icon">🍵</div>
+            <h3 class="added-title">Товар додано до кошику</h3>
+            <div class="added-actions">
+                <button class="btn-continue-white" onclick="UI.closeAddedPopup('continue')">Продовжити покупки</button>
+                <button class="btn-checkout-orange" onclick="UI.closeAddedPopup('checkout')">Оформити замовлення</button>
+            </div>
         </div>
     </div>
 

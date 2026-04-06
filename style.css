@@ -98,9 +98,9 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    z-index: 1000;
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(10px);
+    z-index: 10001; /* Above EVERYTHING including sidebar and modals */
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(15px);
     border-bottom: 1px solid var(--border);
 }
 
@@ -132,7 +132,7 @@ header {
 
 .nav-links {
     display: flex;
-    gap: 30px;
+    gap: 20px;
     align-items: center;
 }
 
@@ -507,9 +507,14 @@ header {
 }
 
 @media (max-width: 720px) {
-    .card { flex: 0 0 calc(50% - 8px); padding: 18px 14px; }
-    .card-title { font-size: 0.95rem; }
-    .card-price { font-size: 0.9rem; }
+    .card { 
+        flex: 0 0 calc(100%); 
+        padding: 30px 20px; 
+        max-width: 400px;
+        margin: 0 auto;
+    }
+    .card-title { font-size: 1.2rem; }
+    .card-price { font-size: 1.1rem; }
 }
 
 
@@ -538,13 +543,11 @@ header {
     position: absolute;
     right: 0;
     width: 100%;
-    max-width: 450px;
     height: 100%;
-    background: #050505;
-    padding: 60px 40px;
+    background: #000;
+    padding: 100px 40px 60px; /* Space for fixed header */
     display: flex;
     flex-direction: column;
-    border-left: 1px solid var(--border);
     transform: translateX(100%);
     transition: var(--transition);
 }
@@ -797,12 +800,21 @@ header {
     .detail-container--v2 {
         grid-template-columns: 1fr;
         padding: 24px 20px 48px;
-        gap: 28px;
+        gap: 32px;
+        text-align: center;
     }
+    .dp-meta { justify-content: center; }
     .dp-name { font-size: 1.8rem; }
-    .dp-brew-grid { grid-template-columns: repeat(2, 1fr); }
-    .dp-purchase { flex-direction: column; align-items: stretch; }
-    .dp-purchase .btn-buy { width: 100%; }
+    .dp-desc { margin: 0 auto; max-width: 90%; }
+    .dp-brew-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .dp-purchase { flex-direction: column; align-items: center; gap: 15px; }
+    .dp-purchase .btn-buy { width: 100%; border-radius: 8px; }
+    .detail-price { 
+        text-align: center; 
+        font-size: 1.8rem; 
+        width: 100%;
+        margin: 15px 0;
+    }
 }
 
 
@@ -1032,6 +1044,81 @@ header {
 }
 
 /* Removed .char styles as title is now static */
+
+/* Stacked Buttons */
+.cart-actions-vertical, .added-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+}
+
+.btn-checkout-orange {
+    width: 100%;
+    padding: 20px;
+    background: var(--orange);
+    color: #000;
+    border: none;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: var(--transition);
+}
+
+.btn-continue-white {
+    width: 100%;
+    padding: 18px;
+    background: transparent;
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.3);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: var(--transition);
+}
+
+.btn-checkout-orange:hover {
+    background: #ff7733;
+    transform: translateY(-2px);
+}
+
+.btn-continue-white:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: #fff;
+}
+
+/* Added Popup Overlay */
+.added-popup {
+    z-index: 11000; /* Above header */
+}
+
+.added-box {
+    background: #0a0a0a;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 40px;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 30px 100px rgba(0,0,0,0.8);
+}
+
+.added-icon {
+    font-size: 3rem;
+    margin-bottom: 20px;
+}
+
+.added-title {
+    font-size: 1.4rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin-bottom: 30px;
+    color: #fff;
+}
 
 /* Category Pills */
 .cat-nav-grid {

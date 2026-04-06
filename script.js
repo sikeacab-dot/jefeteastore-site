@@ -157,7 +157,7 @@ const UI = {
                         <h4 class="card-title">${p.name}</h4>
                         <span class="card-price">${price}₴</span>
                     </div>
-                    <button class="card-add-btn" onclick="UI.quickAdd(event, ${p.id})">Додати</button>
+                    <button class="card-add-btn" onclick="UI.openDetail(${p.id})">Додати</button>
                 </div>
             `;
         }).join('');
@@ -468,6 +468,15 @@ const UI = {
             this.selectVariant(id, defaultW, p.variants[defaultW]);
         }
 
+        // --- GA4 View Item ---
+        if (typeof gtag !== 'undefined') {
+            gtag('event', 'view_item', {
+                currency: 'UAH',
+                value: initialPrice || 0,
+                items: [{ item_id: String(p.id), item_name: p.name, item_category: p.category, price: initialPrice || 0 }]
+            });
+        }
+
         modal.classList.add('active');
         document.body.style.overflow = 'hidden';
     },
@@ -516,28 +525,6 @@ const UI = {
         });
     },
 
-    quickAdd(e, id) {
-        e.stopPropagation();
-        const p = State.db.find(x => x.id === id);
-        if (p) {
-            let grams = '';
-            let price = p.price || 0;
-            if (p.variants) {
-                grams = Object.keys(p.variants).includes('100') ? '100' : Object.keys(p.variants)[0];
-                price = p.variants[grams];
-            }
-            
-            this.addToCartManual({ 
-                id: p.id, 
-                name: p.name, 
-                price, 
-                grams, 
-                image: (p.images ? p.images[0] : p.image) 
-            });
-            this.toast(`${p.name} додано у кошик`);
-        }
-    },
-
     closeDetail() {
         document.getElementById('product-detail').classList.remove('active');
         document.body.style.overflow = 'auto';
@@ -546,16 +533,27 @@ const UI = {
     addToCart(id) {
         const p = State.db.find(x => x.id === id);
         if (p) {
+            const price = State.selectedVariant ? State.selectedVariant.price : p.price;
             this.addToCartManual({
                 id: p.id,
                 name: p.name,
                 category: p.category,
-                price: State.selectedVariant ? State.selectedVariant.price : p.price,
+                price: price,
                 grams: State.selectedVariant ? State.selectedVariant.grams : (p.weight || null),
                 image: (p.images ? p.images[0] : p.image)
             });
-            this.toggleSidebar('cart', true);
             this.closeDetail();
+            // Show the "Added to Cart" popup
+            this.showAddedPopup(p.name);
+
+            // --- GA4 Add to Cart ---
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'add_to_cart', {
+                    currency: 'UAH',
+                    value: price,
+                    items: [{ item_id: String(p.id), item_name: p.name, item_category: p.category, price: price, quantity: 1 }]
+                });
+            }
         }
     },
 
@@ -607,15 +605,23 @@ const UI = {
             if (checkoutBtnBlock) checkoutBtnBlock.style.display = 'block';
         }
 
-        const total = State.cart.reduce((acc, curr) => acc + (curr.price * (curr.qty || 1)), 0);
+        const total = State.cart.reduce((acc, curr) => acc + (Number(curr.price) * (curr.qty || 1)), 0);
         const totalEl = document.getElementById('cart-total');
         if (totalEl) totalEl.innerText = `${total}₴`;
 
         const badge = document.getElementById('cart-qty');
-        if (badge) badge.innerText = State.cart.length;
+        if (badge) badge.innerText = State.cart.reduce((acc, item) => acc + (item.qty || 1), 0);
     },
 
     removeFromCart(index) {
+        const item = State.cart[index];
+        if (item && typeof gtag !== 'undefined') {
+            gtag('event', 'remove_from_cart', {
+                currency: 'UAH',
+                value: item.price * (item.qty || 1),
+                items: [{ item_id: String(item.id), item_name: item.name, price: item.price, quantity: item.qty || 1 }]
+            });
+        }
         State.cart.splice(index, 1);
         this.updateCartUI();
         localStorage.setItem('jefe_cart', JSON.stringify(State.cart));
@@ -662,6 +668,21 @@ const UI = {
     checkout() {
         if (State.cart.length === 0) return;
         this.toggleCheckout(true);
+
+        // --- GA4 Begin Checkout ---
+        if (typeof gtag !== 'undefined') {
+            const total = State.cart.reduce((acc, curr) => acc + (curr.price * (curr.qty || 1)), 0);
+            gtag('event', 'begin_checkout', {
+                currency: 'UAH',
+                value: total,
+                items: State.cart.map(item => ({
+                    item_id: String(item.id),
+                    item_name: item.name,
+                    price: item.price,
+                    quantity: item.qty || 1
+                }))
+            });
+        }
     },
 
     toggleCheckout(open, e) {
@@ -675,7 +696,7 @@ const UI = {
         if (open) {
             this.toggleSidebar('cart', false);
             // Update total in checkout
-            const sum = State.cart.reduce((acc, curr) => acc + curr.price, 0);
+            const sum = State.cart.reduce((acc, curr) => acc + (Number(curr.price) * (curr.qty || 1)), 0);
             document.getElementById('co-total').innerText = `${sum}₴`;
         }
     },
@@ -722,7 +743,7 @@ const UI = {
             deliveryType: document.querySelector('input[name="delivery-type"]:checked').value,
             comment: document.getElementById('co-comment').value,
             items: State.cart,
-            total: State.cart.reduce((acc, curr) => acc + curr.price, 0)
+            total: State.cart.reduce((acc, curr) => acc + (Number(curr.price) * (curr.qty || 1)), 0)
         };
 
         if (data.deliveryType === 'delivery') {
@@ -777,6 +798,21 @@ ${deliveryInfo}
 
         sendToTelegram(message, 'orders');
         
+        // --- GA4 Purchase ---
+        if (typeof gtag !== 'undefined') {
+            gtag('event', 'purchase', {
+                transaction_id: 'T_' + Date.now(),
+                currency: 'UAH',
+                value: data.total,
+                items: data.items.map(item => ({
+                    item_id: String(item.id),
+                    item_name: item.name,
+                    price: item.price,
+                    quantity: item.qty || 1
+                }))
+            });
+        }
+
         // Success feedback
         alert(`Дякую, ${data.name}! Замовлення на суму ${data.total}₴ отримано. Ми зв'яжемося з вами найближчим часом.🍵`);
         
@@ -789,6 +825,24 @@ ${deliveryInfo}
     toggleMessengerOptions(show) {
         const el = document.getElementById('messenger-sub-options');
         if (el) el.style.display = show ? 'block' : 'none';
+    },
+
+    showAddedPopup(name) {
+        const popup = document.getElementById('added-popup');
+        if (!popup) return;
+        popup.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    },
+
+    closeAddedPopup(action) {
+        const popup = document.getElementById('added-popup');
+        if (popup) popup.classList.remove('active');
+        
+        if (action === 'continue') {
+            document.body.style.overflow = 'auto';
+        } else if (action === 'checkout') {
+            this.toggleSidebar('cart', true);
+        }
     }
 };
 
