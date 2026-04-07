@@ -18,20 +18,27 @@ const DEFAULT_TG_CONFIG = {
 const TG_CONFIG = { ...DEFAULT_TG_CONFIG, ...(window.JEFE_CONFIG || {}) };
 
 async function sendToTelegram(message, threadType = 'orders') {
-    if (!TG_CONFIG.token || TG_CONFIG.token.includes('ВАШ_')) {
+    const token = TG_CONFIG.token ? TG_CONFIG.token.trim() : '';
+    const chatId = TG_CONFIG.chatId;
+
+    if (!token || token.includes('ВАШ_')) {
         console.warn("JEFE: Telegram token not configured.");
         return;
     }
     
-    const threadId = TG_CONFIG.threads[threadType];
-    const url = `https://api.telegram.org/bot${TG_CONFIG.token}/sendMessage`;
+    // Check if we have threads, otherwise send to main chat
+    const threadId = (TG_CONFIG.threads && TG_CONFIG.threads[threadType]) || null;
+    const url = `https://api.telegram.org/bot${token}/sendMessage`;
     
     const payload = {
-        chat_id: TG_CONFIG.chatId,
+        chat_id: chatId,
         text: message,
-        parse_mode: 'HTML',
-        message_thread_id: threadId
+        parse_mode: 'HTML'
     };
+
+    if (threadId) {
+        payload.message_thread_id = threadId;
+    }
 
     try {
         const response = await fetch(url, {
@@ -39,10 +46,32 @@ async function sendToTelegram(message, threadType = 'orders') {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
-        if (!response.ok) throw new Error('TG API Error');
+        
+        const result = await response.json();
+        
+        if (!response.ok) {
+            // FALLBACK: If threadId was the problem, try sending without it
+            if (payload.message_thread_id) {
+                console.warn(`JEFE: Thread ${threadId} failed, trying without thread...`, result.description);
+                delete payload.message_thread_id;
+                const secondTry = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (secondTry.ok) {
+                    console.log(`JEFE: Sent to Telegram Main Chat (fallback)`);
+                    return;
+                }
+            }
+            throw new Error(`TG API Error: ${result.description || 'Unknown'}`);
+        }
+        
         console.log(`JEFE: Sent to Telegram (${threadType})`);
     } catch (err) {
         console.error("JEFE: Telegram delivery failed", err);
+        // Alert only during development or for testing?
+        // alert("Помилка відправки замовлення. Будь ласка, напишіть нам у Telegram напряму.");
     }
 }
 
