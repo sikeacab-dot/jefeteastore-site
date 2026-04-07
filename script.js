@@ -9,13 +9,13 @@ const State = {
     selectedVariant: null  // { grams: '100', price: 275 }
 };
 
-// --- TELEGRAM CONFIGURATION ---
-// Configuration is now pulled from config.js (excluded from Git)
-const TG_CONFIG = window.JEFE_CONFIG || {
-    token: '', // Put your new token in config.js
-    chatId: '', 
+const DEFAULT_TG_CONFIG = {
+    token: '',
+    chatId: '',
     threads: { orders: 3, inquiries: 4, newsletter: 8 }
 };
+
+const TG_CONFIG = { ...DEFAULT_TG_CONFIG, ...(window.JEFE_CONFIG || {}) };
 
 async function sendToTelegram(message, threadType = 'orders') {
     if (!TG_CONFIG.token || TG_CONFIG.token.includes('ВАШ_')) {
