@@ -12,10 +12,19 @@ const State = {
 const DEFAULT_TG_CONFIG = {
     token: '',
     chatId: '',
-    threads: { orders: 3, inquiries: 4, newsletter: 8 }
+    threads: { orders: 3, inquiries: 3, newsletter: 3 }
 };
 
 const TG_CONFIG = { ...DEFAULT_TG_CONFIG, ...(window.JEFE_CONFIG || {}) };
+
+// Helper to escape HTML characters for Telegram
+function escapeHTML(str) {
+    if (!str) return '—';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
 
 async function sendToTelegram(message, threadType = 'orders') {
     const token = TG_CONFIG.token ? TG_CONFIG.token.trim() : '';
@@ -815,35 +824,34 @@ const UI = {
         console.log('Order submitted:', data);
 
         // --- Telegram Integration ---
-        let itemsList = data.items.map(item => 
-            `▫️ <b>${item.name}</b> ${item.grams ? `(${item.grams}г)` : ''} x${item.qty} — ${item.price * item.qty}₴`
+        let itemsListHTML = data.items.map(item => 
+            `▫️ <b>${escapeHTML(item.name)}</b> ${item.grams ? `(${escapeHTML(item.grams)}г)` : ''} x${item.qty} — ${item.price * item.qty}₴`
         ).join('\n');
 
-        let deliveryInfo = data.deliveryType === 'pickup' 
+        let deliveryInfoHTML = data.deliveryType === 'pickup' 
             ? '🏪 <b>Самовивіз</b> (Нагірна)'
             : `🚚 <b>Доставка:</b> ${data.courierType === 'np' ? 'Нова Пошта' : 'Таксі'}\n` +
               (data.courierType === 'np' 
-                ? `📍 Мiсто: ${data.npCity}\n🏢 Вiддiлення: ${data.npBranch}` 
-                : `🏠 Адреса: ${data.taxiAddress}`);
+                ? `📍 Мiсто: ${escapeHTML(data.npCity)}\n🏢 Вiддiлення: ${escapeHTML(data.npBranch)}` 
+                : `🏠 Адреса: ${escapeHTML(data.taxiAddress)}`);
 
         const message = `
 📦 <b>НОВЕ ЗАМОВЛЕННЯ</b>
 
-👤 <b>Клієнт:</b> ${data.name}
-📞 <b>Телефон:</b> <code>${data.phone}</code>
-📧 <b>Email:</b> ${data.email || '—'}
+👤 <b>Клієнт:</b> ${escapeHTML(data.name)}
+📞 <b>Телефон:</b> <code>${escapeHTML(data.phone)}</code>
+📧 <b>Email:</b> ${escapeHTML(data.email)}
 
 🛍 <b>Товари:</b>
-${itemsList}
+${itemsListHTML}
 
 💰 <b>Разом:</b> <b>${data.total}₴</b>
 
 ---
-${deliveryInfo}
+${deliveryInfoHTML}
 
-💬 <b>Коментар:</b> ${data.comment || '—'}
+💬 <b>Коментар:</b> ${escapeHTML(data.comment)}
         `.trim();
-
         sendToTelegram(message, 'orders');
         
         // --- GA4 Purchase ---
@@ -891,6 +899,18 @@ ${deliveryInfo}
         } else if (action === 'checkout') {
             this.toggleSidebar('cart', true);
         }
+    },
+
+    toast(msg) {
+        let t = document.getElementById('jefe-toast');
+        if (!t) {
+            t = document.createElement('div');
+            t.id = 'jefe-toast';
+            document.body.appendChild(t);
+        }
+        t.textContent = msg;
+        t.classList.add('active');
+        setTimeout(() => t.classList.remove('active'), 3000);
     }
 };
 
@@ -958,10 +978,10 @@ const FooterModal = {
         const message = `
 ❓ <b>НОВЕ ЗВЕРНЕННЯ (МЕНЕДЖЕР)</b>
 
-👤 <b>Ім'я:</b> ${name}
-📞 <b>Телефон:</b> <code>${phone}</code>
+👤 <b>Ім'я:</b> ${escapeHTML(name)}
+📞 <b>Телефон:</b> <code>${escapeHTML(phone)}</code>
 💬 <b>Питання:</b>
-${question}
+${escapeHTML(question)}
         `.trim();
 
         // Show loading state on button
@@ -990,18 +1010,22 @@ ${question}
 };
 
 const Marketing = {
-    handleNewsletter(e) {
+    async handleNewsletter(e) {
         e.preventDefault();
-        const email = document.getElementById('news-email').value.trim();
+        const input = document.getElementById('news-email');
+        const email = input.value.trim();
         if (!email) return;
 
-        const message = `📬 <b>НОВА ПІДПИСКА</b>\n\nEmail: <code>${email}</code>`;
-        sendToTelegram(message, 'newsletter');
+        const btn = e.target.querySelector('button');
+        if (btn) btn.disabled = true;
 
-        document.getElementById('news-email').value = '';
-        if (typeof UI !== 'undefined' && UI.toast) {
-            UI.toast('Дякуємо за підписку! 🍵');
-        }
+        const message = `📬 <b>НОВА ПІДПИСКА</b>\n\nEmail: <code>${escapeHTML(email)}</code>`;
+        await sendToTelegram(message, 'newsletter');
+
+        input.value = '';
+        if (btn) btn.disabled = false;
+        
+        UI.toast('Дякуємо за підписку! 🍵');
     }
 };
 
