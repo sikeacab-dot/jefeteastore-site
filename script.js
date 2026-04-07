@@ -943,32 +943,49 @@ const FooterModal = {
         document.body.style.overflow = '';
     },
 
-    submitForm(e) {
+    async submitForm(e) {
         e.preventDefault();
-        const question = document.getElementById('mgr-question').value.trim();
-        const phone    = document.getElementById('mgr-phone').value.trim();
-        if (!question || !phone) return;
+        const name     = document.getElementById('mgr-name')?.value.trim() || '—';
+        const phone    = document.getElementById('mgr-phone')?.value.trim();
+        const question = document.getElementById('mgr-question')?.value.trim() || '—';
+        
+        if (!phone) {
+            alert('Будь ласка, введіть номер телефону');
+            return;
+        }
 
         // --- Telegram Integration ---
         const message = `
-❓ <b>НОВЕ ЗВЕРНЕННЯ</b>
+❓ <b>НОВЕ ЗВЕРНЕННЯ (МЕНЕДЖЕР)</b>
 
+👤 <b>Ім'я:</b> ${name}
 📞 <b>Телефон:</b> <code>${phone}</code>
 💬 <b>Питання:</b>
 ${question}
         `.trim();
 
-        sendToTelegram(message, 'inquiries');
+        // Show loading state on button
+        const btn = e.target;
+        const originalText = btn.textContent;
+        btn.textContent = 'Надсилаємо...';
+        btn.disabled = true;
 
-        // Reset + close
-        document.getElementById('mgr-question').value = '';
-        document.getElementById('mgr-phone').value = '';
-        this.close('manager');
+        await sendToTelegram(message, 'inquiries');
 
-        // Show success toast via UI
-        if (typeof UI !== 'undefined' && UI.toast) {
-            UI.toast('Повідомлення надіслано! Ми зв\'яжемося з вами 🍵');
+        // Replace modal body with success message
+        const body = document.querySelector('.mp-body');
+        if (body) {
+            body.innerHTML = `
+                <div style="text-align: center; padding: 40px 20px; color: #fff;">
+                    <div style="font-size: 3rem; margin-bottom: 20px;">🍵</div>
+                    <h3 style="margin-bottom: 15px; font-weight: 800;">Дякуємо!</h3>
+                    <p style="opacity: 0.8; line-height: 1.5; font-size: 0.95rem;">Ми отримали ваш запит і зв'яжемось з вами найближчим часом.</p>
+                </div>
+            `;
         }
+
+        // Auto-close after 3 seconds
+        setTimeout(() => this.close('manager'), 4000);
     }
 };
 
