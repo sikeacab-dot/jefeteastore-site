@@ -171,16 +171,24 @@ const UI = {
         grid.innerHTML = items.map((p, idx) => {
             const imgSrc = (p.images && p.images[0]) || p.image || '';
             const blurData = (window.PLACEHOLDERS && window.PLACEHOLDERS[imgSrc]) || '';
-            const price = p.variants 
+            const priceValue = p.variants 
                 ? (p.variants['100'] || Object.values(p.variants)[0]) 
                 : (p.price || 0);
+            const priceHtml = p.on_order 
+                ? `<span class="card-price on-order">Під замовлення</span>` 
+                : `<span class="card-price">${priceValue}₴</span>`;
             // First 4 cards: eager load with high priority (above the fold)
             const isAboveFold = idx < 4;
             const loadAttr = isAboveFold ? 'eager' : 'lazy';
             const priorityAttr = isAboveFold ? 'fetchpriority="high"' : '';
 
+            const badgeHtml = p.badge && p.badge !== 'none' 
+                ? `<div class="badge badge-${p.badge.toLowerCase()}">${p.badge}</div>` 
+                : '';
+
             return `
                 <div class="card reveal" onclick="UI.openDetail(${p.id})">
+                    ${badgeHtml}
                     <div class="card-media">
                         <img src="${imgSrc}" 
                              style="background-image: url('${blurData}')" 
@@ -193,7 +201,7 @@ const UI = {
                     <p class="card-cat">${p.category}</p>
                     <div class="card-info">
                         <h4 class="card-title">${p.name}</h4>
-                        <span class="card-price">${price}₴</span>
+                        ${priceHtml}
                     </div>
                     <button class="card-add-btn" onclick="UI.openDetail(${p.id})">Додати</button>
                 </div>
@@ -311,7 +319,7 @@ const UI = {
                         <div class="search-result-name">${highlightedName}</div>
                         <div class="search-result-cat">${p.category}</div>
                     </div>
-                    <span class="search-result-price">${price}₴</span>
+                    <span class="search-result-price">${p.on_order ? 'Під замовлення' : price + '₴'}</span>
                 </div>
             `;
         }).join('');
@@ -415,7 +423,7 @@ const UI = {
             ? (p.variants[weights.includes('100') ? '100' : weights[0]])
             : p.price;
 
-        const variantsHtml = weights.length > 0 ? `
+        const variantsHtml = (weights.length > 0 && !p.on_order) ? `
             <div class="dp-block">
                 <div class="detail-variants" id="detail-variants">
                     ${weights.map(w => `
@@ -471,7 +479,10 @@ const UI = {
                                 <span class="dp-cat">${p.category}</span>
                                 ${originHtml}
                             </div>
-                            <h2 class="dp-name">${p.name}</h2>
+                            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 12px; flex-wrap: wrap;">
+                                <h2 class="dp-name" style="margin-bottom: 0;">${p.name}</h2>
+                                ${p.badge && p.badge !== 'none' ? `<span class="badge badge-${p.badge.toLowerCase()}" style="position: static;">${p.badge}</span>` : ''}
+                            </div>
                             <p class="dp-desc">${desc}</p>
                         </div>
                         ${brewHtml}
@@ -480,7 +491,7 @@ const UI = {
                     <div class="dp-content-bottom">
                          ${variantsHtml}
                          <div class="dp-price-wrap">
-                             <div class="detail-price" id="detail-price">${initialPrice}₴</div>
+                             <div class="detail-price" id="detail-price">${p.on_order ? 'Під замовлення' : initialPrice + '₴'}</div>
                          </div>
                          <div class="dp-purchase">
                              <button class="btn-buy" onclick="UI.addToCart(${p.id})">
