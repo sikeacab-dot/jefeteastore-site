@@ -109,6 +109,7 @@ const UI = {
         // Data Sync Fallback
         this.syncDatabase();
         this.setupDropdown();
+        console.log("JEFE: Mobile logic reinforced.");
     },
 
     setupDropdown() {
@@ -783,6 +784,7 @@ const UI = {
         document.body.classList.toggle('no-scroll', open);
         
         if (open) {
+            window.scrollTo(0, 0); // Force background reset
             modal.scrollTop = 0; // Reset scroll on open
             this.toggleSidebar('cart', false);
             // Update total in checkout
