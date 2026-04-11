@@ -348,6 +348,7 @@ const UI = {
     },
 
     setupMouseEffects() {
+        if (window.matchMedia("(pointer: coarse)").matches) return; // Skip on mobile
         const glow = document.querySelector('.mesh-glow');
         const cursor = document.querySelector('.cursor');
 

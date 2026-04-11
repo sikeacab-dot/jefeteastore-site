@@ -24,20 +24,39 @@
     }
     
     /* Extreme performance optimization for mobile */
-    .header, .nav-pills, .card, .badge, .detail-view, .search-overlay-bg, .search-input-wrap, .btn-buy, .card-add-btn {
+    .header, .card, .badge, .detail-view, .search-overlay-bg, .search-input-wrap, .btn-buy, .card-add-btn, .sidebar-content {
         backdrop-filter: none !important;
         -webkit-backdrop-filter: none !important;
         box-shadow: none !important;
     }
+
+    /* Remove heavy background effects entirely on mobile to prevent crashes */
+    .grain, .mesh-glow {
+        display: none !important;
+    }
     
     .header { background: #000 !important; border-bottom: 2px solid #111; }
-    .nav-pills { background: #111 !important; border-color: #222; }
     .card { background: #080808 !important; border-color: #1a1a1a !important; }
     .detail-view { background: #000 !important; }
 
     /* Disable animations that burden mobile CPU */
     .card-media { animation: none !important; background: #0a0a0a !important; }
     .card:hover { transform: none !important; }
+
+    /* Full-screen app-like modals */
+    .sidebar-content {
+        width: 100% !important;
+        height: 100vh !important;
+        max-width: 100% !important;
+        transform: translateY(100%) !important;
+        right: 0 !important;
+        top: 0 !important;
+        box-shadow: none !important;
+    }
+    
+    .sidebar.active .sidebar-content {
+        transform: translateY(0) !important;
+    }
 }
 
 * {
@@ -682,6 +701,38 @@ header {
 @media (max-width: 768px) {
     .sidebar-content {
         width: 100%;
+        max-width: 100%;
+        border: none;
+        padding-top: env(safe-area-inset-top);
+    }
+    
+    .sidebar-header {
+        padding: 30px 20px;
+        border-bottom: 1px solid #111;
+    }
+    
+    .sidebar-header h3 {
+        font-size: 2rem;
+        font-weight: 900;
+        text-transform: uppercase;
+    }
+
+    .checkout-fields {
+        gap: 25px;
+        padding: 10px;
+    }
+
+    .c-field input, .c-field textarea {
+        padding: 18px;
+        font-size: 1rem;
+        background: #0d0d0d;
+    }
+
+    .sidebar-footer {
+        padding: 20px;
+        border-top: 1px solid #111;
+        background: #000;
+        padding-bottom: calc(20px + env(safe-area-inset-bottom));
     }
 }
 
