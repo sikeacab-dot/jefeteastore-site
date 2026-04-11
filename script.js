@@ -1,6 +1,6 @@
 /**
- * JEFE TEASTORE - ULTIMATE UNIFIED ENGINE
- * Focus: Stability, Performance, Premium UX.
+ * JEFE TEASTORE - ULTIMATE UNIFIED ENGINE v2
+ * Focus: logic safety, checkout validation, premium stability.
  */
 
 const State = {
@@ -48,7 +48,7 @@ async function sendToTelegram(message, threadType = 'orders') {
 // --- Core UI Engine ---
 const UI = {
     init() {
-        console.log("JEFE: Engine Active.");
+        console.log("JEFE: Engine Active. Stability Mode.");
         try { State.cart = JSON.parse(localStorage.getItem('jefe_cart')) || []; } catch(e) { State.cart = []; }
         
         if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
@@ -86,11 +86,14 @@ const UI = {
             this.renderProducts();
         });
 
-        // Global close
+        // Global click handler for closing sidebars via overlay
         document.addEventListener('click', e => {
-            if (e.target.classList.contains('sidebar')) {
-                const id = e.target.id.replace('-sidebar', '');
-                this.toggleSidebar(id, false);
+            if (e.target.classList.contains('sidebar-overlay')) {
+                const sidebar = e.target.closest('.sidebar');
+                if (sidebar) {
+                    const id = sidebar.id.replace('-sidebar', '');
+                    this.toggleSidebar(id, false);
+                }
             }
             if (e.target.classList.contains('detail-view')) this.closeDetail();
         });
@@ -162,7 +165,7 @@ const UI = {
         modal.scrollTop = 0;
 
         const images = p.images?.length > 0 ? p.images : [p.image];
-        const weights = p.variants ? Object.keys(p.variants).sort((a,b) => a-b) : [];
+        const weights = p.variants ? Object.keys(p.variants).sort((a,b) => Number(a)-Number(b)) : [];
         const initialPrice = weights.length > 0 ? p.variants[weights.includes('100') ? '100' : weights[0]] : p.price;
 
         container.innerHTML = `
@@ -183,14 +186,14 @@ const UI = {
                             <div class="dp-label">Вага</div>
                             <div class="detail-variants">
                                 ${weights.map(w => `
-                                    <button class="weight-btn ${w===(weights.includes('100')?'100':weights[0])?'active':''}" 
+                                    <button type="button" class="weight-btn ${w===(weights.includes('100')?'100':weights[0])?'active':''}" 
                                             onclick="UI.selectVariant(${id}, '${w}', ${p.variants[w]})">${w}г</button>
                                 `).join('')}
                             </div>
                         </div>` : ''}
                     <div class="dp-bottom">
                         <div class="detail-price" id="detail-price">${initialPrice}₴</div>
-                        <button class="btn-buy" onclick="UI.addToCart(${p.id})">${p.on_order ? 'Замовити' : 'В кошик'}</button>
+                        <button type="button" class="btn-buy" onclick="UI.addToCart(${p.id})">${p.on_order ? 'Замовити' : 'В кошик'}</button>
                     </div>
                 </div>
             </div>
@@ -203,7 +206,8 @@ const UI = {
 
     selectVariant(id, grams, price) {
         State.selectedVariant = { grams, price };
-        document.getElementById('detail-price').innerText = `${price}₴`;
+        const priceEl = document.getElementById('detail-price');
+        if (priceEl) priceEl.innerText = `${price}₴`;
         document.querySelectorAll('.weight-btn').forEach(b => b.classList.toggle('active', b.innerText === grams+'г'));
     },
 
@@ -232,6 +236,16 @@ const UI = {
         this.updateCartUI();
         localStorage.setItem('jefe_cart', JSON.stringify(State.cart));
         this.closeDetail();
+        
+        // Show confirmation popup
+        const popup = document.getElementById('added-popup');
+        if (popup) popup.classList.add('active');
+    },
+
+    closeAddedPopup(action) {
+        const popup = document.getElementById('added-popup');
+        if (popup) popup.classList.remove('active');
+        if (action === 'checkout') this.toggleSidebar('cart', true);
     },
 
     updateCartUI() {
@@ -262,7 +276,7 @@ const UI = {
                     </div>
                     <div style="text-align:right;">
                         <div style="font-weight:800;">${item.price * item.qty}₴</div>
-                        <button onclick="UI.removeFromCart(${idx})" style="background:none; border:none; color:#ff4444; font-size:1.2rem; cursor:pointer;">&times;</button>
+                        <button type="button" onclick="UI.removeFromCart(${idx})" style="background:none; border:none; color:#ff4444; font-size:1.2rem; cursor:pointer;">&times;</button>
                     </div>
                 </div>
             `).join('');
@@ -282,15 +296,17 @@ const UI = {
         document.body.classList.toggle('no-scroll', open);
     },
 
+    // UI Entry point for checkout from cart
     checkout() {
         if (State.cart.length === 0) return;
+        // ONLY open the checkout view, do NOT trigger any submission logic
         this.toggleCheckout(true);
     },
 
     toggleCheckout(open) {
         this.toggleSidebar('checkout', open);
         if (open) {
-            this.toggleSidebar('cart', false);
+            this.toggleSidebar('cart', false); // Clean switch
             const total = State.cart.reduce((a, b) => a + (b.price * b.qty), 0);
             const coTotal = document.getElementById('co-total');
             if (coTotal) coTotal.innerText = `${total}₴`;
@@ -311,52 +327,78 @@ const UI = {
         if (taxiFields) taxiFields.style.display = (type === 'taxi' ? 'block' : 'none');
     },
 
+    // Robust Submission Handler
     async handleCheckoutSubmit(e) {
-        e.preventDefault();
+        e.preventDefault(); // CRITICAL: Stop the browser from submitting the form normally
+        
+        const phoneField = document.getElementById('co-phone');
+        const phone = phoneField ? phoneField.value.trim() : '';
+
+        // Strict Validation: Stop if phone is missing or invalid
+        if (!phone || phone === '+380' || phone.length < 10) {
+            alert("Будь ласка, введіть коректний номер телефону для зв'язку.");
+            if (phoneField) phoneField.focus();
+            return;
+        }
+
         const btn = e.target.querySelector('button[type="submit"]');
-        if (btn) btn.disabled = true;
+        if (btn) {
+            btn.disabled = true;
+            btn.innerText = "Відправляємо...";
+        }
 
-        const data = {
-            name: document.getElementById('co-name')?.value || 'Клієнт',
-            phone: document.getElementById('co-phone')?.value || '—',
-            messenger: document.querySelector('input[name="order-messenger"]:checked')?.value || 'Telegram',
-            comment: document.getElementById('co-comment')?.value || '—',
-            deliveryType: document.querySelector('input[name="delivery-type"]:checked')?.value || 'pickup',
-            courierType: document.querySelector('input[name="courier-type"]:checked')?.value || 'np',
-            total: State.cart.reduce((a, b) => a + (b.price * b.qty), 0)
-        };
+        try {
+            const data = {
+                name: document.getElementById('co-name')?.value.trim() || 'Клієнт',
+                messenger: document.querySelector('input[name="order-messenger"]:checked')?.value || 'Telegram',
+                comment: document.getElementById('co-comment')?.value.trim() || '—',
+                deliveryType: document.querySelector('input[name="delivery-type"]:checked')?.value || 'pickup',
+                courierType: document.querySelector('input[name="courier-type"]:checked')?.value || 'np',
+                total: State.cart.reduce((a, b) => a + (b.price * b.qty), 0)
+            };
 
-        let deliveryMsg = data.deliveryType === 'pickup' ? '🏪 Самовивіз (Нагірна 16)' : '🚚 Доставка';
-        if (data.deliveryType === 'delivery') {
-            if (data.courierType === 'np') {
-                const city = document.getElementById('co-np-city')?.value || '—';
-                const branch = document.getElementById('co-np-branch')?.value || '—';
-                deliveryMsg += ` (Нова Пошта): ${city}, Відділення ${branch}`;
-            } else {
-                const addr = document.getElementById('co-taxi-address')?.value || '—';
-                deliveryMsg += ` (Таксі): ${addr}`;
+            let deliveryMsg = data.deliveryType === 'pickup' ? '🏪 Самовивіз (Нагірна 16)' : '🚚 Доставка';
+            if (data.deliveryType === 'delivery') {
+                if (data.courierType === 'np') {
+                    const city = document.getElementById('co-np-city')?.value.trim() || '—';
+                    const branch = document.getElementById('co-np-branch')?.value.trim() || '—';
+                    deliveryMsg += ` (Нова Пошта): ${city}, Відділення ${branch}`;
+                } else {
+                    const addr = document.getElementById('co-taxi-address')?.value.trim() || '—';
+                    deliveryMsg += ` (Таксі): ${addr}`;
+                }
+            }
+            
+            const itemsList = State.cart.map(i => `• ${i.name} ${i.grams ? '('+i.grams+'г)' : ''} x${i.qty} — ${i.price * i.qty}₴`).join('\n');
+            
+            const message = `🛍 <b>НОВЕ ЗАМОВЛЕННЯ</b>\n\n` +
+                `👤 Клієнт: <b>${escapeHTML(data.name)}</b>\n` +
+                `📞 Телефон: <code>${escapeHTML(phone)}</code>\n` +
+                `💬 Зв'язок: <b>${data.messenger}</b>\n\n` +
+                `📜 Товари:\n${itemsList}\n\n` +
+                `💰 Разом: <b>${data.total}₴</b>\n` +
+                `📍 Доставка: ${escapeHTML(deliveryMsg)}\n` +
+                `💬 Коментар: ${escapeHTML(data.comment)}`;
+
+            await sendToTelegram(message);
+            
+            // CLEANUP ONLY ON SUCCESS
+            State.cart = [];
+            localStorage.removeItem('jefe_cart');
+            this.updateCartUI();
+            this.toggleCheckout(false);
+            
+            alert("Дякуємо! Замовлення прийнято. Менеджер зв'яжеться з вами найближчим часом.");
+
+        } catch (err) {
+            console.error("Submission failed", err);
+            alert("Сталася помилка при відправці. Спробуйте ще раз або зверніться до нас напрямую.");
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerText = "Підтвердити замовлення";
             }
         }
-        
-        const itemsList = State.cart.map(i => `• ${i.name} ${i.grams ? '('+i.grams+'г)' : ''} x${i.qty} — ${i.price * i.qty}₴`).join('\n');
-        
-        const message = `🛍 <b>НОВЕ ЗАМОВЛЕННЯ</b>\n\n` +
-            `👤 Клієнт: <b>${escapeHTML(data.name)}</b>\n` +
-            `📞 Телефон: <code>${escapeHTML(data.phone)}</code>\n` +
-            `💬 Зв'язок: <b>${data.messenger}</b>\n\n` +
-            `📜 Товари:\n${itemsList}\n\n` +
-            `💰 Разом: <b>${data.total}₴</b>\n` +
-            `📍 Доставка: ${escapeHTML(deliveryMsg)}\n` +
-            `💬 Коментар: ${escapeHTML(data.comment)}`;
-
-        await sendToTelegram(message);
-        
-        State.cart = [];
-        localStorage.removeItem('jefe_cart');
-        this.updateCartUI();
-        this.toggleCheckout(false);
-        alert("Дякуємо! Замовлення прийнято. Менеджер зв'яжеться з вами найближчим часом.");
-        if (btn) btn.disabled = false;
     },
 
     setupObservers() {
@@ -369,7 +411,10 @@ const UI = {
         const glow = document.querySelector('.mesh-glow');
         const cursor = document.querySelector('.cursor');
         window.onmousemove = (e) => {
-            if (cursor) { cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px'; }
+            if (cursor) {
+                cursor.style.left = e.clientX + 'px';
+                cursor.style.top = e.clientY + 'px';
+            }
             if (glow) {
                 const x = (e.clientX / window.innerWidth) * 100;
                 const y = (e.clientY / window.innerHeight) * 100;
@@ -410,13 +455,33 @@ const FooterModal = {
     },
     async submitForm(e) {
         e.preventDefault();
-        const name = document.getElementById('mgr-name').value;
-        const phone = document.getElementById('mgr-phone').value;
+        const nameInput = document.getElementById('mgr-name');
+        const phoneInput = document.getElementById('mgr-phone');
+        
+        const name = nameInput ? nameInput.value.trim() : '—';
+        const phone = phoneInput ? phoneInput.value.trim() : '';
+
+        if (!phone || phone === '+380') {
+            alert("Вкажіть ваш номер телефону.");
+            return;
+        }
+
         const msg = `🙋‍♂️ <b>ПИТАННЯ МЕНЕДЖЕРУ</b>\n\nІм'я: ${name}\nТел: ${phone}`;
         await sendToTelegram(msg, 'inquiries');
         this.close('manager');
         alert("Дякуємо! Ми зв'яжемося з вами.");
     }
 };
+
+// --- Keyboard Logic ---
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        UI.closeDetail();
+        UI.toggleSidebar('cart', false);
+        UI.toggleSidebar('checkout', false);
+        UI.toggleSidebar('cat', false);
+        UI.toggleSearch(false);
+    }
+});
 
 document.addEventListener('DOMContentLoaded', () => UI.init());

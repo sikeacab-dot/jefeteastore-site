@@ -421,7 +421,7 @@
                     <textarea id="mgr-question" placeholder="Хочу замовити улун..."></textarea>
                 </div>
 
-                <button class="mp-submit" onclick="FooterModal.submitForm(event)">Надіслати запит</button>
+                <button type="button" class="mp-submit" onclick="FooterModal.submitForm(event)">Надіслати запит</button>
             </div>
         </div>
     </div>
@@ -434,7 +434,7 @@
         <div class="sidebar-content">
             <div style="display: flex; justify-content: space-between; margin-bottom: 40px;">
                 <h3 style="font-family: var(--font-body); font-weight: 900; font-size: 2rem;">Категорії</h3>
-                <button class="nav-btn" onclick="UI.toggleSidebar('cat', false)" style="font-size: 1.5rem;">&times;</button>
+                <button type="button" class="nav-btn" onclick="UI.toggleSidebar('cat', false)" style="font-size: 1.5rem;">&times;</button>
             </div>
             <div id="cat-list" style="display: flex; flex-direction: column; gap: 20px;">
                 <!-- Categories injected via JS -->
@@ -448,7 +448,7 @@
         <div class="sidebar-content">
             <div class="sidebar-header">
                 <h3>Кошик</h3>
-                <button class="nav-btn" onclick="UI.toggleSidebar('cart', false)">&times;</button>
+                <button type="button" class="nav-btn" onclick="UI.toggleSidebar('cart', false)">&times;</button>
             </div>
             <div id="cart-items" class="sidebar-body">
                 <!-- Cart items -->
@@ -459,8 +459,8 @@
                     <span id="cart-total">0₴</span>
                 </div>
                 <div class="cart-actions-vertical">
-                    <button class="btn-continue-white" onclick="UI.toggleSidebar('cart', false)">Продовжити покупки</button>
-                    <button class="btn-checkout-white" onclick="UI.checkout()">Оформити замовлення</button>
+                    <button type="button" class="btn-continue-white" onclick="UI.toggleSidebar('cart', false)">Продовжити покупки</button>
+                    <button type="button" class="btn-checkout-white" onclick="UI.checkout()">Оформити замовлення</button>
                 </div>
             </div>
         </div>
@@ -469,7 +469,7 @@
     <!-- Product Detail Modal -->
     <div id="product-detail" class="detail-view">
         <div class="detail-header">
-            <button class="nav-btn close-btn" onclick="UI.closeDetail()" aria-label="Закрити">
+            <button type="button" class="nav-btn close-btn" onclick="UI.closeDetail()" aria-label="Закрити">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -491,7 +491,7 @@
                     <path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                 </svg>
                 <input type="text" id="search-input" class="search-input" placeholder="Знайти чай..." autocomplete="off" oninput="UI.handleSearch(this.value)">
-                <button class="search-close-btn" onclick="UI.toggleSearch(false)" aria-label="Закрити">&times;</button>
+                <button type="button" class="search-close-btn" onclick="UI.toggleSearch(false)" aria-label="Закрити">&times;</button>
             </div>
             <div class="search-hint" id="search-hint">Почни вводити назву чаю або категорію</div>
             <div id="search-results" class="search-results"></div>
@@ -504,7 +504,7 @@
         <div class="sidebar-content">
             <div class="sidebar-header">
                 <h3>Оформити</h3>
-                <button class="nav-btn" onclick="UI.toggleCheckout(false)">&times;</button>
+                <button type="button" class="nav-btn" onclick="UI.toggleCheckout(false)">&times;</button>
             </div>
             <div class="sidebar-body">
             
@@ -540,7 +540,7 @@
                     
                     <div class="c-field">
                         <label>Email (необов'язково)</label>
-                        <input type="text" id="co-email" placeholder="example@mail.com">
+                        <input type="email" id="co-email" placeholder="example@mail.com">
                     </div>
 
                     <div class="c-field">
@@ -608,6 +608,7 @@
                     </div>
                 </div>
 
+            </form>
             </div>
             <div class="sidebar-footer">
                 <div class="sidebar-total">
@@ -628,8 +629,8 @@
             <div class="added-icon">🍵</div>
             <h3 class="added-title">Товар додано до кошику</h3>
             <div class="added-actions">
-                <button class="btn-continue-white" onclick="UI.closeAddedPopup('continue')">Продовжити покупки</button>
-                <button class="btn-checkout-white" onclick="UI.closeAddedPopup('checkout')">Оформити замовлення</button>
+                <button type="button" class="btn-continue-white" onclick="UI.closeAddedPopup('continue')">Продовжити покупки</button>
+                <button type="button" class="btn-checkout-white" onclick="UI.closeAddedPopup('checkout')">Оформити замовлення</button>
             </div>
         </div>
     </div>

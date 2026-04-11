@@ -89,7 +89,15 @@
         color: #fff !important;
     }
 
-    /* Bottom-sheet Handle Decor */
+    /* Premium Bottom-sheet Sidebar for Mobile */
+    .sidebar {
+        top: 0 !important;
+        height: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: flex-end !important;
+    }
+
     .sidebar-content::before {
         content: "";
         position: absolute;
@@ -100,13 +108,33 @@
         height: 4px;
         background: rgba(255,255,255,0.2);
         border-radius: 2px;
+        z-index: 10;
     }
 
     .sidebar-content {
+        position: relative !important;
+        width: 100% !important;
+        height: auto !important;
+        max-height: 90vh !important;
         border-radius: 24px 24px 0 0 !important;
         background: #0a0a0a !important;
         border-top: 1px solid rgba(255,255,255,0.1) !important;
-        padding: 40px 20px 20px !important; /* Top padding for handle */
+        padding: 40px 20px 20px !important;
+        transform: translateY(100%) !important;
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+
+    .sidebar.active .sidebar-content {
+        transform: translateY(0) !important;
+    }
+
+    .sidebar-overlay {
+        backdrop-filter: blur(5px) !important;
+        background: rgba(0,0,0,0.7) !important;
+    }
+
+    .sidebar-header {
+        padding: 10px 0 20px !important;
     }
 }
 
