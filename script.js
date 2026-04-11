@@ -481,7 +481,6 @@ const UI = {
                             </div>
                             <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 12px; flex-wrap: wrap;">
                                 <h2 class="dp-name" style="margin-bottom: 0;">${p.name}</h2>
-                                ${p.badge && p.badge !== 'none' ? `<span class="badge badge-${p.badge.toLowerCase()}" style="position: static;">${p.badge}</span>` : ''}
                             </div>
                             <p class="dp-desc">${desc}</p>
                         </div>

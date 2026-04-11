@@ -694,16 +694,21 @@ header {
 /* Detail View - Modal beneath header */
 .detail-view {
     position: fixed;
-    top: 87px;
+    top: 0;
     left: 0;
     width: 100%;
-    height: calc(100vh - 87px);
-    background: #000;
+    height: 100%;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(20px);
     z-index: 3000;
     transform: translateY(100%);
     transition: var(--transition);
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 0;
 }
 
 .detail-view.active { transform: translateY(0); }
@@ -796,8 +801,11 @@ header {
 
 .detail-container--v2 {
     max-width: 1100px;
-    margin: 0 auto;
-    padding: 20px 40px 80px;
+    margin: auto;
+    padding: 40px;
+    background: #000;
+    border: 1px solid var(--border);
+    border-radius: 20px;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 60px;
@@ -844,7 +852,7 @@ header {
 .dp-content-top {
     display: flex;
     flex-direction: column;
-    gap: 40px; /* Increased gap for top blocks */
+    gap: 30px; /* Reduced gap for top blocks */
 }
 
 .dp-content-bottom {
@@ -854,7 +862,7 @@ header {
 }
 
 /* Top internal section */
-.dp-top { display: flex; flex-direction: column; gap: 40px; } /* Balanced gaps around description */
+.dp-top { display: flex; flex-direction: column; gap: 24px; } /* Balanced gaps around description */
 
 .dp-meta {
     display: flex;
