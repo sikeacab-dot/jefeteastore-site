@@ -237,14 +237,21 @@ const UI = {
         localStorage.setItem('jefe_cart', JSON.stringify(State.cart));
         this.closeDetail();
         
-        // Show confirmation popup
+        // Show confirmation popup and lock scroll
         const popup = document.getElementById('added-popup');
-        if (popup) popup.classList.add('active');
+        if (popup) {
+            popup.classList.add('active');
+            document.body.classList.add('no-scroll');
+        }
     },
 
     closeAddedPopup(action) {
         const popup = document.getElementById('added-popup');
         if (popup) popup.classList.remove('active');
+        // Only remove scroll lock if no other sidebars are active
+        if (!document.querySelector('.sidebar.active')) {
+            document.body.classList.remove('no-scroll');
+        }
         if (action === 'checkout') this.toggleSidebar('cart', true);
     },
 
