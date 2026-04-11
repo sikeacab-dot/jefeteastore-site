@@ -8,8 +8,8 @@
 :root {
     --bg: #000;
     --text: #fff;
-    --accent: #fff; /* White Accent */
-    --orange: #FF5500; /* Vibrant Orange */
+    --accent: #fff;
+    --orange: #FF5500;
     --border: rgba(255,255,255,0.1);
     --font-heading: 'Agoka', sans-serif;
     --font-body: 'Inter', sans-serif;
@@ -17,61 +17,83 @@
 }
 
 @media (max-width: 820px) {
-    .hero {
-        height: auto !important;
-        min-height: 90vh !important;
-        padding: 120px 20px 60px !important;
+    :root {
+        --bg: #000;
+        --border: rgba(255,255,255,0.2);
     }
     
-    /* Brighter borders for cards on mobile as requested */
+    body { background: #000 !important; }
+    
     .card {
-        background: #080808 !important;
-        border: 1px solid rgba(255,255,255,0.3) !important; /* Brighter white border */
-        box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
+        background: #000 !important;
+        border: 1px solid rgba(255,255,255,0.4) !important;
+        margin-bottom: 20px;
+        padding: 30px 20px !important;
+        width: 100% !important;
+        max-width: 100% !important;
     }
 
-    .card:active {
-        border-color: #fff !important;
-    }
-    
-    /* Extreme performance optimization for mobile */
-    .header, .badge, .detail-view, .search-overlay-bg, .search-input-wrap, .btn-buy, .card-add-btn, .sidebar-content {
-        backdrop-filter: none !important;
-        -webkit-backdrop-filter: none !important;
-        box-shadow: none !important;
-    }
+    .card-media { background: #000 !important; }
 
-    /* Remove heavy background effects entirely on mobile to prevent crashes */
-    .grain, .mesh-glow {
-        display: none !important;
-    }
-    
-    .header { background: #000 !important; border-bottom: 2px solid #111; }
-    .detail-view { background: #000 !important; }
-
-    /* Disable animations that burden mobile CPU */
-    .card-media { animation: none !important; background: #0a0a0a !important; }
-    .card:hover { transform: none !important; }
-
-    /* Full-screen app-like modals */
     .sidebar {
-        z-index: 20000 !important;
+        z-index: 99999 !important;
+        background: #000 !important;
+        display: flex;
+        flex-direction: column;
     }
     
     .sidebar-content {
         width: 100% !important;
-        height: 100vh !important;
+        height: 100% !important;
         max-width: 100% !important;
+        background: #000 !important;
+        position: relative !important;
         transform: translateY(100%) !important;
-        right: 0 !important;
-        top: 0 !important;
-        left: 0 !important;
-        box-shadow: none !important;
-        background: #000 !important; /* Solid black, no transparency */
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
     }
-    
+
     .sidebar.active .sidebar-content {
         transform: translateY(0) !important;
+    }
+
+    .sidebar-header {
+        padding: 60px 20px 20px !important;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 15px;
+    }
+
+    .sidebar-header h3 {
+        font-size: 2.22rem !important;
+        font-weight: 900 !important;
+        text-transform: uppercase;
+    }
+
+    .nav-btn.close-sidebar-btn {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 44px;
+        height: 44px;
+        background: #1a1a1a;
+        border-radius: 50%;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem !important;
+        z-index: 100;
+        border: none;
+        color: #fff;
+    }
+    
+    .checkout-fields {
+        padding: 20px !important;
+        background: #000 !important;
     }
 }
 
@@ -105,7 +127,6 @@ body.no-scroll {
     touch-action: none !important;
 }
 
-/* Background Effects - Simplified for better performance and clarity */
 .grain {
     position: fixed;
     top: 0;
@@ -125,11 +146,9 @@ body.no-scroll {
     width: 100%;
     height: 100%;
     z-index: -1;
-    background:
-        radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+    background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgba(255, 255, 255, 0.05) 0%, transparent 50%);
     pointer-events: none;
 }
-/* Removed old dynamic dragon layers */
 
 .cursor {
     position: fixed;

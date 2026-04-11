@@ -109,7 +109,17 @@ const UI = {
         // Data Sync Fallback
         this.syncDatabase();
         this.setupDropdown();
+        this.optimizeForMobile();
         console.log("JEFE: Mobile logic reinforced.");
+    },
+
+    optimizeForMobile() {
+        if (window.matchMedia("(pointer: coarse)").matches) {
+            console.log("JEFE: Mobile performance mode engaged.");
+            // Physical removal of heavy elements to free GPU/RAM
+            document.querySelectorAll('.grain, .mesh-glow, .cursor').forEach(el => el.remove());
+            document.body.classList.add('is-mobile');
+        }
     },
 
     setupDropdown() {
