@@ -282,9 +282,15 @@ const UI = {
         document.body.classList.toggle('no-scroll', open);
     },
 
+    checkout() {
+        if (State.cart.length === 0) return;
+        this.toggleCheckout(true);
+    },
+
     toggleCheckout(open) {
         this.toggleSidebar('checkout', open);
         if (open) {
+            this.toggleSidebar('cart', false);
             const total = State.cart.reduce((a, b) => a + (b.price * b.qty), 0);
             const coTotal = document.getElementById('co-total');
             if (coTotal) coTotal.innerText = `${total}₴`;
