@@ -114,14 +114,17 @@
     .sidebar-content {
         position: relative !important;
         width: 100% !important;
+        max-width: 100% !important;
         height: auto !important;
-        max-height: 90vh !important;
-        border-radius: 24px 24px 0 0 !important;
+        max-height: 92vh !important;
+        border-radius: 20px 20px 0 0 !important;
         background: #0a0a0a !important;
         border-top: 1px solid rgba(255,255,255,0.1) !important;
-        padding: 40px 20px 20px !important;
+        padding: 40px 15px 15px !important; /* Optimized padding for full-width */
         transform: translateY(100%) !important;
         transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        margin: 0 !important;
+        left: 0 !important;
     }
 
     .sidebar.active .sidebar-content {
