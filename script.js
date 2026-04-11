@@ -108,6 +108,22 @@ const UI = {
 
         // Data Sync Fallback
         this.syncDatabase();
+        this.setupDropdown();
+    },
+
+    setupDropdown() {
+        const btn = document.querySelector('.dropdown-btn');
+        const content = document.querySelector('.dropdown-content');
+        if (!btn || !content) return;
+
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            content.classList.toggle('active');
+        });
+
+        document.addEventListener('click', () => {
+            content.classList.remove('active');
+        });
     },
 
     syncDatabase() {
@@ -260,6 +276,7 @@ const UI = {
 
         sidebar.classList.toggle('active', open);
         document.body.classList.toggle('no-scroll', open);
+        if (open && content) content.scrollTop = 0; // Reset scroll on open
     },
 
     toggleSearch(open) {
@@ -385,6 +402,10 @@ const UI = {
 
         const modal = document.getElementById('product-detail');
         const container = document.getElementById('detail-content');
+        
+        // Reset scroll position to top
+        modal.scrollTop = 0;
+        if (container) container.scrollTop = 0;
 
         // ── Images ──────────────────────────────────────────
         const images = (p.images && p.images.length > 0) ? p.images : (p.image ? [p.image] : []);
@@ -710,17 +731,10 @@ const UI = {
     },
 
     setupScrollEffects() {
+        // Removed dynamic transforms to prevent mobile scrolling jumps
+        const scrollIndicator = document.getElementById('scroll-indicator');
         window.addEventListener('scroll', () => {
             const scroll = window.scrollY;
-            const heroTitle = document.querySelector('.hero-main-title');
-            if (heroTitle) {
-                // Return the beautiful slide-up scrolling parallax
-                heroTitle.style.transform = `translateY(${Math.max(-200, scroll * 0.4)}px)`;
-                heroTitle.style.opacity = Math.max(0, 1 - (scroll / 600));
-            }
-
-            // Hide scroll indicator after user starts scrolling
-            const scrollIndicator = document.getElementById('scroll-indicator');
             if (scrollIndicator) {
                 scrollIndicator.classList.toggle('hidden', scroll > 80);
             }
@@ -766,8 +780,9 @@ const UI = {
 
         modal.classList.toggle('active', open);
         document.body.classList.toggle('no-scroll', open);
-
+        
         if (open) {
+            modal.scrollTop = 0; // Reset scroll on open
             this.toggleSidebar('cart', false);
             // Update total in checkout
             const sum = State.cart.reduce((acc, curr) => acc + (Number(curr.price) * (curr.qty || 1)), 0);
