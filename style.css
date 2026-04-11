@@ -17,42 +17,58 @@
 }
 
 @media (max-width: 820px) {
-    :root {
-        --bg: #000;
-        --border: rgba(255,255,255,0.2);
-    }
-    
     body { background: #000 !important; }
-    
-    .card {
-        background: #000 !important;
-        border: 1px solid rgba(255,255,255,0.4) !important;
-        margin-bottom: 20px;
-        padding: 30px 20px !important;
+
+    /* Single Column Grid - No horizontal scroll, no overflow */
+    #product-grid {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 40px !important;
+        padding: 20px !important;
         width: 100% !important;
         max-width: 100% !important;
     }
 
-    .card-media { background: #000 !important; }
-
-    .sidebar {
-        z-index: 99999 !important;
+    .card {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
         background: #000 !important;
-        display: flex;
-        flex-direction: column;
+        border: 1px solid rgba(255,255,255,0.4) !important;
+        padding: 25px 15px !important;
+        border-radius: 12px !important;
+        box-sizing: border-box !important;
     }
-    
+
+    .card-media {
+        aspect-ratio: 1/1 !important;
+        background: #000 !important;
+        width: 100% !important;
+    }
+
+    /* TRUE Full Screen Sidebar */
+    .sidebar {
+        z-index: 999999 !important;
+        background: #000 !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        position: fixed !important;
+        overflow: hidden !important;
+    }
+
     .sidebar-content {
         width: 100% !important;
         height: 100% !important;
-        max-width: 100% !important;
-        background: #000 !important;
-        position: relative !important;
         transform: translateY(100%) !important;
         transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
-        display: flex;
-        flex-direction: column;
-        overflow-y: auto;
+        background: #000 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow-y: auto !important;
+        padding-bottom: 50px !important;
     }
 
     .sidebar.active .sidebar-content {
@@ -60,37 +76,31 @@
     }
 
     .sidebar-header {
-        padding: 60px 20px 20px !important;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        gap: 15px;
+        padding: 80px 20px 30px !important;
+        text-align: center !important;
     }
 
     .sidebar-header h3 {
-        font-size: 2.22rem !important;
+        font-size: 2.2rem !important;
         font-weight: 900 !important;
-        text-transform: uppercase;
+        text-transform: uppercase !important;
     }
 
     .nav-btn.close-sidebar-btn {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        width: 44px;
-        height: 44px;
-        background: #1a1a1a;
-        border-radius: 50%;
+        position: absolute !important;
+        top: 25px !important;
+        right: 20px !important;
+        width: 50px !important;
+        height: 50px !important;
+        background: #1a1a1a !important;
+        border-radius: 50% !important;
         display: flex !important;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem !important;
-        z-index: 100;
-        border: none;
-        color: #fff;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 2rem !important;
+        border: none !important;
     }
-    
+
     .checkout-fields {
         padding: 20px !important;
         background: #000 !important;

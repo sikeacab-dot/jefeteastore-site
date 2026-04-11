@@ -204,10 +204,10 @@ const UI = {
             const priceHtml = p.on_order 
                 ? `<span class="card-price on-order">Під замовлення</span>` 
                 : `<span class="card-price">${priceValue}₴</span>`;
-            // First 4 cards: eager load with high priority (above the fold)
-            const isAboveFold = idx < 4;
-            const loadAttr = isAboveFold ? 'eager' : 'lazy';
-            const priorityAttr = isAboveFold ? 'fetchpriority="high"' : '';
+            // AGGRESSIVE Lazy Loading for Mobile Stability
+            const isMobile = window.matchMedia("(pointer: coarse)").matches;
+            const loadAttr = (isMobile && idx > 2) ? 'lazy' : 'eager';
+            const priorityAttr = (idx < 2) ? 'fetchpriority="high"' : '';
 
             const badgeHtml = p.badge && p.badge !== 'none' 
                 ? `<div class="badge badge-${p.badge.toLowerCase()}">${p.badge}</div>` 
