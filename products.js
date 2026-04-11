@@ -108,7 +108,7 @@ var products = [
         ],
         "origin": "Тайвань",
         "description": "Преміальний улун, ферментований для збагачення ГАМК. Солодкуватий фруктово-медовий смак із карамельною нотою.\n\nЧай для розслаблення, спокою та ясності мислення.",
-        "on_order": true,
+        "on_order": false,
         "badge": "HIT",
         "brewing": {
             "steeps": 7,
@@ -143,10 +143,10 @@ var products = [
         "id": 1775867846686,
         "name": "Да Хун Пао \"Вогняний\"",
         "category": "Oolong",
-        "price": 350,
+        "price": 400,
         "variants": {
-            "50": 200,
-            "100": 350
+            "50": 250,
+            "100": 400
         },
         "image": "assets/products/DHP.webp",
         "images": [
@@ -210,46 +210,22 @@ var products = [
         "id": 1771117657775,
         "name": "Смола Пуеру \"Ча Гао\"",
         "category": "Puerh",
-        "price": 200,
-        "variants": null,
+        "price": 300,
+        "variants": {
+            "50": 300
+        },
+        "image": "assets/products/prod_1771117657775_0.webp",
         "images": [
             "assets/products/prod_1771117657775_0.webp"
         ],
-        "image": "assets/products/image_4.webp",
         "origin": "Юньнань, Китай",
         "description": "Концентрований екстракт пуеру з дуже насиченим, «ядерним» смаком. Глибокі ноти темного пуеру, щільність та інтенсивність у кожному ковтку.\n\nЧай для тонусу, концентрації та швидкого ефекту.\n\nЦіна вказана за 50 шт.",
         "on_order": false,
         "badge": "none",
         "brewing": {
             "steeps": 2,
-            "time": 30,
-            "grams": 1
-        }
-    },
-    {
-        "id": 5,
-        "name": "Пуер \"Менхай\"",
-        "category": "Puerh",
-        "price": 275,
-        "variants": {
-            "50": 150,
-            "100": 275,
-            "357": 500
-        },
-        "image": "assets/products/prod_5_0.webp",
-        "images": [
-            "assets/products/prod_5_0.webp",
-            "assets/products/prod_5_1.webp",
-            "assets/products/prod_5_2.webp"
-        ],
-        "origin": "Юньнань, Китай",
-        "description": "Класичний витриманий шу пуер у формі млинця. Не надто гіркий, із землянистими нотами, деревними відтінками та легкою солодкістю.\n\nЧай для тепла, спокою та м’якої концентрації.",
-        "on_order": true,
-        "badge": "none",
-        "brewing": {
-            "steeps": 6,
             "time": 20,
-            "grams": 8
+            "grams": 1
         }
     },
     {
@@ -273,30 +249,6 @@ var products = [
         "brewing": {
             "steeps": 7,
             "time": 15,
-            "grams": 7
-        }
-    },
-    {
-        "id": 4,
-        "name": "Ті Гуань Інь",
-        "category": "Oolong",
-        "price": 250,
-        "variants": {
-            "100": 250,
-            "200": 450
-        },
-        "image": "assets/products/prod_4_0.webp",
-        "images": [
-            "assets/products/prod_4_0.webp",
-            "assets/products/prod_4_1.webp"
-        ],
-        "origin": "Фуцзянь, Китай",
-        "description": "Високогірний улун із квітковим ароматом, м’якою вершковістю та солодким післясмаком. Красиве скручене листя розкривається у великі пластини.\n\nЧай для легкості, гармонії та приємного релаксу.",
-        "on_order": true,
-        "badge": "none",
-        "brewing": {
-            "steeps": 5,
-            "time": 20,
             "grams": 7
         }
     },
@@ -345,6 +297,56 @@ var products = [
         "brewing": {
             "steeps": 6,
             "time": 15,
+            "grams": 7
+        }
+    },
+    {
+        "id": 5,
+        "name": "Пуер \"Менхай\"",
+        "category": "Puerh",
+        "price": 275,
+        "variants": {
+            "50": 150,
+            "100": 275,
+            "357": 500
+        },
+        "image": "assets/products/prod_5_0.webp",
+        "images": [
+            "assets/products/prod_5_0.webp",
+            "assets/products/prod_5_1.webp",
+            "assets/products/prod_5_2.webp"
+        ],
+        "origin": "Юньнань, Китай",
+        "description": "Класичний витриманий шу пуер у формі млинця. Не надто гіркий, із землянистими нотами, деревними відтінками та легкою солодкістю.\n\nЧай для тепла, спокою та м’якої концентрації.",
+        "on_order": true,
+        "badge": "none",
+        "brewing": {
+            "steeps": 6,
+            "time": 20,
+            "grams": 8
+        }
+    },
+    {
+        "id": 4,
+        "name": "Ті Гуань Інь",
+        "category": "Oolong",
+        "price": 250,
+        "variants": {
+            "100": 250,
+            "200": 450
+        },
+        "image": "assets/products/prod_4_0.webp",
+        "images": [
+            "assets/products/prod_4_0.webp",
+            "assets/products/prod_4_1.webp"
+        ],
+        "origin": "Фуцзянь, Китай",
+        "description": "Високогірний улун із квітковим ароматом, м’якою вершковістю та солодким післясмаком. Красиве скручене листя розкривається у великі пластини.\n\nЧай для легкості, гармонії та приємного релаксу.",
+        "on_order": true,
+        "badge": "none",
+        "brewing": {
+            "steeps": 5,
+            "time": 20,
             "grams": 7
         }
     }
