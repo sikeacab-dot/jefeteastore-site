@@ -433,6 +433,12 @@ const UI = {
                 </div>
             </div>` : '';
 
+        // ── Price ──────────────────────────────────────────
+        const priceHtml = p.on_order ? '' : `
+            <div class="dp-price-wrap">
+                <div class="detail-price" id="detail-price">${initialPrice}₴</div>
+            </div>`;
+
         // ── Origin ──────────────────────────────────────────
         const originHtml = p.origin ? `
             <div class="dp-origin">
@@ -489,13 +495,11 @@ const UI = {
 
                     <div class="dp-content-bottom">
                          ${variantsHtml}
-                         <div class="dp-price-wrap">
-                             <div class="detail-price" id="detail-price">${p.on_order ? 'Під замовлення' : initialPrice + '₴'}</div>
-                         </div>
+                         ${priceHtml}
                          <div class="dp-purchase">
                              <button class="btn-buy" onclick="UI.addToCart(${p.id})">
                                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-                                 Додати в кошик
+                                 ${p.on_order ? 'Замовити' : 'Додати в кошик'}
                              </button>
                          </div>
                     </div>
@@ -581,7 +585,10 @@ const UI = {
     addToCart(id) {
         const p = State.db.find(x => x.id === id);
         if (p) {
-            const price = State.selectedVariant ? State.selectedVariant.price : p.price;
+            let price = p.price;
+            if (p.on_order) price = 0;
+            else if (State.selectedVariant) price = State.selectedVariant.price;
+
             this.addToCartManual({
                 id: p.id,
                 name: p.name,
