@@ -507,14 +507,32 @@
             
             <form id="checkout-form" onsubmit="UI.handleCheckoutSubmit(event)">
                 <div class="checkout-fields">
-                    <div class="c-field">
-                        <label>ПІБ *</label>
-                        <input type="text" id="co-name" placeholder="Іванов Іван" required>
+                    <div class="c-field messenger-field">
+                        <label>Ваш месенджер *</label>
+                        <div class="messenger-selector-tg">
+                            <label class="messenger-option-tg">
+                                <input type="radio" name="order-messenger" value="Telegram" checked>
+                                <span class="messenger-box-tg">Telegram</span>
+                            </label>
+                            <label class="messenger-option-tg">
+                                <input type="radio" name="order-messenger" value="Viber">
+                                <span class="messenger-box-tg">Viber</span>
+                            </label>
+                            <label class="messenger-option-tg">
+                                <input type="radio" name="order-messenger" value="WhatsApp">
+                                <span class="messenger-box-tg">WhatsApp</span>
+                            </label>
+                        </div>
                     </div>
-                    
+
                     <div class="c-field">
                         <label>Номер телефону *</label>
                         <input type="tel" id="co-phone" value="+380" placeholder="+380 XX XXX XX XX" required>
+                    </div>
+
+                    <div class="c-field desktop-only">
+                        <label>ПІБ (необов'язково)</label>
+                        <input type="text" id="co-name" placeholder="Іванов Іван">
                     </div>
                     
                     <div class="c-field">

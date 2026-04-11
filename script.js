@@ -110,7 +110,11 @@ const UI = {
         this.syncDatabase();
         this.setupDropdown();
         this.optimizeForMobile();
-        console.log("JEFE: Mobile logic reinforced.");
+        
+        // Device Detection for logic switch
+        State.isMobile = window.matchMedia("(max-width: 820px)").matches;
+        
+        console.log(`JEFE: Logic initialized. Mobile Mode: ${State.isMobile}`);
     },
 
     optimizeForMobile() {
@@ -181,6 +185,9 @@ const UI = {
     },
 
     renderProducts(filter = 'all') {
+        if (State.isMobile) {
+            return MobileUI.renderProducts(filter);
+        }
         const grid = document.getElementById('product-grid');
         let items = [];
 
@@ -1073,4 +1080,70 @@ const Marketing = {
         UI.toast('Дякуємо за підписку! 🍵');
     }
 };
+
+/**
+ * MOBILE UI ENGINE (Ported from Mini App)
+ * Dedicated logic for mobile users to ensure stability and familiarity.
+ */
+const MobileUI = {
+    renderProducts(filter = 'all') {
+        const grid = document.getElementById('product-grid');
+        if (!grid) return;
+        
+        let items = filter === 'all' ? State.db : State.db.filter(p => p.category === filter);
+        
+        grid.innerHTML = items.map(p => {
+            const img = (p.images && p.images.length > 0) ? p.images[0] : (p.image || '');
+            let priceDisplay = `${p.price}₴`;
+            if (p.on_order) {
+                priceDisplay = '<span style="font-size: 0.85em; color: #888;">Під замовлення</span>';
+            } else if (p.variants) {
+                const firstWeight = Object.keys(p.variants).sort((a,b) => a-b)[0];
+                priceDisplay = `${p.variants[firstWeight]}₴`;
+            }
+            
+            return `
+            <div class="card" onclick="MobileUI.openProduct(${p.id})">
+                <div class="card-media">
+                    <img src="${img}" alt="${p.name}" loading="lazy">
+                </div>
+                <div class="card-info">
+                    <div class="product-category" style="font-size: 0.55rem; color: #888; text-transform: uppercase; letter-spacing: 1px;">${p.category}</div>
+                    <div class="card-title" style="font-weight: 700; font-size: 0.85rem; margin: 4px 0; min-height: 2.4em; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${p.name}</div>
+                    <div class="card-price" style="font-size: 0.9rem; font-weight: 700; background: rgba(255,255,255,0.08); padding: 2px 10px; border-radius: 12px; display: inline-block;">${priceDisplay}</div>
+                    <button class="btn-mini-add" style="width: 100%; margin-top: 10px; padding: 10px; border-radius: 12px; border: 1px solid #fff; background: transparent; color: #fff; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">Додати</button>
+                </div>
+            </div>`;
+        }).join('');
+    },
+
+    openProduct(id) {
+        // Lightweight event to UI show detail
+        UI.showDetail(id);
+        if (window.matchMedia("(max-width: 820px)").matches) {
+            document.getElementById('product-detail').classList.add('active');
+        }
+    }
+};
+
+// Global click handler to close sidebar on overlay tap
+document.addEventListener('click', e => {
+    if (e.target.classList.contains('sidebar')) {
+        const id = e.target.id.replace('-sidebar', '');
+        UI.toggleSidebar(id, false);
+    }
+    if (e.target.classList.contains('detail-view')) {
+        UI.closeDetail();
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Ported from TG app - but for our site structure
+    document.querySelectorAll('.sidebar').forEach(m => m.addEventListener('click', e => { 
+        if (e.target === m) {
+            const sid = m.id.replace('-sidebar', '');
+            UI.toggleSidebar(sid, false);
+        }
+    }));
+});
 
