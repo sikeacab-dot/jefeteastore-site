@@ -169,7 +169,7 @@ const UI = {
         const initialPrice = weights.length > 0 ? p.variants[weights.includes('100') ? '100' : weights[0]] : p.price;
 
         container.innerHTML = `
-            <div class="detail-container">
+            <div class="detail-container--v2">
                 <div class="detail-media">
                     <div class="img-slider">
                         <div class="img-slider-track">
@@ -191,7 +191,7 @@ const UI = {
                                 `).join('')}
                             </div>
                         </div>` : ''}
-                    <div class="dp-bottom">
+                    <div class="dp-purchase">
                         <div class="detail-price" id="detail-price">${initialPrice}₴</div>
                         <button type="button" class="btn-buy" onclick="UI.addToCart(${p.id})">${p.on_order ? 'Замовити' : 'В кошик'}</button>
                     </div>
@@ -276,14 +276,19 @@ const UI = {
         } else {
             container.innerHTML = State.cart.map((item, idx) => `
                 <div class="cart-item">
-                    <img src="${item.image}" style="width:50px; height:50px; border-radius:8px; object-fit:cover;">
-                    <div style="flex:1;">
-                        <div style="font-weight:700; font-size:0.9rem;">${item.name}</div>
-                        <div style="font-size:0.75rem; opacity:0.6;">${item.grams?item.grams+'г':''} x${item.qty}</div>
+                    <img src="${item.image}" class="cart-item-img">
+                    <div class="cart-item-info">
+                        <div class="cart-item-name">${item.name}</div>
+                        <div class="cart-item-meta">${item.grams?item.grams+'г':''} x${item.qty}</div>
                     </div>
-                    <div style="text-align:right;">
-                        <div style="font-weight:800;">${item.price * item.qty}₴</div>
-                        <button type="button" onclick="UI.removeFromCart(${idx})" style="background:none; border:none; color:#ff4444; font-size:1.2rem; cursor:pointer;">&times;</button>
+                    <div class="cart-item-right">
+                        <div class="cart-item-price">${item.price * item.qty}₴</div>
+                        <button type="button" class="btn-cart-remove" onclick="UI.removeFromCart(${idx})">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
                     </div>
                 </div>
             `).join('');
@@ -301,6 +306,58 @@ const UI = {
         const el = document.getElementById(`${type}-sidebar`);
         if (el) el.classList.toggle('active', open);
         document.body.classList.toggle('no-scroll', open);
+    },
+
+    toggleSearch(open) {
+        const overlay = document.getElementById('search-overlay');
+        const input = document.getElementById('search-input');
+        if (overlay) overlay.classList.toggle('active', open);
+        if (open) {
+            document.body.classList.add('no-scroll');
+            setTimeout(() => input?.focus(), 100);
+        } else {
+            if (!document.querySelector('.sidebar.active')) {
+                document.body.classList.remove('no-scroll');
+            }
+        }
+    },
+
+    handleSearch(query) {
+        const results = document.getElementById('search-results');
+        const hint = document.getElementById('search-hint');
+        if (!results || !hint) return;
+
+        const q = query.trim().toLowerCase();
+        if (q.length < 2) {
+            results.innerHTML = '';
+            hint.style.display = 'block';
+            return;
+        }
+
+        hint.style.display = 'none';
+        const matches = State.db.filter(p => 
+            p.name.toLowerCase().includes(q) || 
+            p.category.toLowerCase().includes(q)
+        ).slice(0, 10);
+
+        if (matches.length === 0) {
+            results.innerHTML = `<div class="search-no-results">Нічого не знайдено</div>`;
+            return;
+        }
+
+        results.innerHTML = matches.map(p => {
+            const price = p.variants ? (Object.values(p.variants)[0]) : p.price;
+            return `
+                <div class="search-result-item" onclick="UI.toggleSearch(false); UI.openDetail(${p.id})">
+                    <img src="${p.images?.[0] || p.image || ''}" class="search-result-img">
+                    <div class="search-result-info">
+                        <div class="search-result-name">${p.name}</div>
+                        <div class="search-result-cat">${p.category}</div>
+                    </div>
+                    <div class="search-result-price">${p.on_order ? 'Замовлення' : price + '₴'}</div>
+                </div>
+            `;
+        }).join('');
     },
 
     // UI Entry point for checkout from cart

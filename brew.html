@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Як заварювати справжній китайський чай: Пуер, Улуни, Габа. Короткий гайд для початківців від jefeteastore.">
+    <title>jefeteastore | Як заварювати чай</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --brew-bg: #050505; }
+        body { background: var(--brew-bg); padding-top: 120px; color: #fff; }
+        .brew-header { text-align: center; max-width: 800px; margin: 0 auto 60px; padding: 0 24px; }
+        .brew-header h1 { font-size: clamp(2rem, 7vw, 4rem); font-weight: 900; text-transform: uppercase; margin-bottom: 20px; }
+        .brew-header p { color: var(--orange); letter-spacing: 3px; text-transform: uppercase; font-weight: 700; font-size: 0.8rem; }
+        
+        .brew-container { max-width: 1000px; margin: 0 auto; padding: 0 24px 100px; display: flex; flex-direction: column; gap: 40px; }
+        .brew-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; padding: 40px; backdrop-filter: blur(10px); }
+        .brew-card h2 { font-size: 2rem; font-weight: 900; margin-bottom: 25px; color: var(--orange); text-transform: uppercase; }
+        
+        .brew-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; margin-bottom: 30px; }
+        .step-item { display: flex; flex-direction: column; gap: 8px; }
+        .step-label { font-size: 0.7rem; text-transform: uppercase; opacity: 0.4; letter-spacing: 1px; font-weight: 700; }
+        .step-val { font-size: 1.2rem; font-weight: 800; }
+        
+        .brew-method { line-height: 1.8; color: rgba(255,255,255,0.7); font-size: 1rem; }
+        .brew-method strong { color: #fff; }
+        .rule-box { margin-top: 30px; padding: 20px; background: rgba(255, 90, 0, 0.1); border-left: 3px solid var(--orange); border-radius: 0 12px 12px 0; }
+        .rule-box p { font-size: 0.9rem; font-weight: 700; color: #fff; }
+
+        @media (max-width: 768px) {
+            .brew-card { padding: 30px 20px; }
+            .brew-steps { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="grain"></div>
+    <div class="mesh-glow"></div>
+
+    <header>
+        <a href="index.html" class="brand">
+            <img src="assets/new_logo.png" alt="JEFE" class="brand-img">
+        </a>
+        <div class="nav-links">
+            <!-- 1. Search (Magnifier) -->
+            <button class="nav-btn search-toggle-btn" id="search-toggle-btn" onclick="UI.toggleSearch(true)" aria-label="Пошук" style="display: flex; align-items: center; justify-content: center;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
+                    <path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </button>
+            <!-- 2. Support (Chat Bubble) -->
+            <button class="nav-btn" onclick="FooterModal.open('manager')" aria-label="Підтримка" style="display: flex; align-items: center; justify-content: center;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+                </svg>
+            </button>
+            <!-- 3. Catalog (Grid Icon) -->
+            <div class="dropdown" onclick="this.classList.toggle('active')">
+                <button class="nav-btn dropdown-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    <span class="nav-text">Каталог</span>
+                </button>
+                <div class="dropdown-content">
+                    <a href="index.html">Товари</a>
+                    <a href="blog.html">Блог</a>
+                    <a href="brew.html">Як заварювати</a>
+                    <a href="#" onclick="FooterModal.open('contacts')">Контакти</a>
+                </div>
+            </div>
+            <!-- 4. Cart (Bag Icon with Badge) -->
+            <button class="nav-btn cart-btn" onclick="UI.toggleSidebar('cart', true)" style="position: relative;">
+                <div class="cart-icon-wrapper" style="position: relative; display: flex; align-items: center;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <path d="M16 10a4 4 0 0 1-8 0"></path>
+                    </svg>
+                    <span id="cart-qty" class="cart-badge">0</span>
+                </div>
+                <span class="nav-text" style="margin-left: 8px;">Кошик</span>
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <div class="brew-header">
+            <p>Гайд для початківців</p>
+            <h1>ЯК ЗАВАРЮВАТИ <span style="color: var(--orange);">ПРАВИЛЬНО.</span></h1>
+            <p style="color: rgba(255,255,255,0.4); margin-top: 10px;">Прості кроки до ідеальної чашки</p>
+        </div>
+
+        <div class="brew-container">
+            <!-- Puerh -->
+            <div class="brew-card">
+                <h2>Шу Пуер</h2>
+                <div class="brew-steps">
+                    <div class="step-item"><span class="step-label">Температура</span><span class="step-val">95-100°C</span></div>
+                    <div class="step-item"><span class="step-label">Кількість</span><span class="step-val">7-8г / 150мл</span></div>
+                    <div class="step-item"><span class="step-label">Час проливу</span><span class="step-val">10-20 сек</span></div>
+                </div>
+                <div class="brew-method">
+                    <p>1. <strong>Промивка:</strong> Залийте чай окропом і через 5 секунд повністю злийте воду. Це очистить лист і "розбудить" його аромат.</p>
+                    <p>2. <strong>Заварювання:</strong> Залийте воду знову. Настоюйте 15 секунд і зливайте в чашку. Кожен наступний пролив робіть на 5-10 секунд довшим.</p>
+                </div>
+            </div>
+
+            <!-- Oolongs -->
+            <div class="brew-card">
+                <h2>Улуни</h2>
+                <div class="brew-steps">
+                    <div class="step-item"><span class="step-label">Температура</span><span class="step-val">85-90°C</span></div>
+                    <div class="step-item"><span class="step-label">Кількість</span><span class="step-val">6-7г / 150мл</span></div>
+                    <div class="step-item"><span class="step-label">Час проливу</span><span class="step-val">15-30 сек</span></div>
+                </div>
+                <div class="brew-method">
+                    <p>1. <strong>Підготовка:</strong> Не використовуйте крутий окріп, дайте чайнику постояти 2-3 хвилини після закипання. Обов'язково промийте лист швидким проливом (5 сек).</p>
+                    <p>2. <strong>Насолода:</strong> Робіть короткі проливи. Улун віддає аромат поступово, змінюючи ноти від квіткових до пряних.</p>
+                </div>
+            </div>
+
+            <!-- Gaba -->
+            <div class="brew-card" style="border-color: var(--orange);">
+                <h2>ГАБА (Gaba)</h2>
+                <div class="brew-steps">
+                    <div class="step-item"><span class="step-label">Температура</span><span class="step-val">85°C</span></div>
+                    <div class="step-item"><span class="step-label">Кількість</span><span class="step-val">7г / 150мл</span></div>
+                    <div class="step-item"><span class="step-label">Час проливу</span><span class="step-val">20-40 сек</span></div>
+                </div>
+                <div class="brew-method">
+                    <p>1. <strong>Особливість:</strong> Габа — дуже ніжний чай. Використовуйте м'яку воду низької температури.</p>
+                    <div class="rule-box">
+                        <p>⚠️ ВАЖЛИВО: Перший пролив ГАБИ НЕ ЗЛИВАЄТЬСЯ. Саме в ньому міститься найбільша концентрація корисної амінокислоти (ГАМК). Пийте відразу!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-divider"></div>
+        <div class="footer-bottom" style="text-align: center; padding: 40px 0;">
+            <p>© 2025 JEFE TEASTORE. Те, що заварюють для душі.</p>
+            <a href="index.html" style="color: var(--orange); text-decoration: none; font-weight: 800; font-size: 0.8rem; margin-top: 20px; display: inline-block; text-transform: uppercase; letter-spacing: 2px;">← Повернутись до магазину</a>
+        </div>
+    </footer>
+
+    <script src="script.js" defer></script>
+</body>
+</html>
