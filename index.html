@@ -447,6 +447,21 @@
 
 
 
+    <!-- Modal: Thank You / Success -->
+    <div class="fmodal-overlay" id="fmodal-thanks" onclick="FooterModal.closeAll(event)">
+        <div class="fmodal-box" style="text-align: center;">
+            <button class="fmodal-close" onclick="FooterModal.close('thanks')">×</button>
+            <div class="fmodal-icon" style="font-size: 3rem; margin-bottom: 20px;">🍵</div>
+            <h3 style="font-size: 2rem; margin-bottom: 15px;">Дякуємо!</h3>
+            <div class="fmodal-content">
+                <p style="font-size: 1.1rem; line-height: 1.6; opacity: 0.8;">
+                    Ваш запит отримано. Менеджер зв'яжеться з вами найближчим часом через обраний месенджер або телефон.
+                </p>
+            </div>
+            <button class="btn-checkout-white" onclick="FooterModal.close('thanks')" style="margin-top: 30px; width: 100%;">Зрозуміло</button>
+        </div>
+    </div>
+
     <!-- Sidebar: Catalog / Category Breakdown -->
     <div id="cat-sidebar" class="sidebar">
         <div class="sidebar-overlay" onclick="UI.toggleSidebar('cat', false)"></div>

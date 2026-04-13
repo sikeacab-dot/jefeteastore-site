@@ -125,19 +125,20 @@
     }
 
     .sidebar-content {
-        position: relative !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
         width: 100% !important;
         max-width: 100% !important;
-        height: auto !important;
-        max-height: 94vh !important;
-        border-radius: 20px 20px 0 0 !important;
+        height: 100vh !important;
+        max-height: 100vh !important;
+        border-radius: 0 !important;
         background: #0a0a0a !important;
-        border-top: 1px solid rgba(255,255,255,0.1) !important;
-        padding: 40px 0 0 !important; /* No side padding for content container */
+        border-top: none !important;
+        padding: 80px 0 0 !important; /* Start below the main header area */
         transform: translateY(100%) !important;
         transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
         margin: 0 !important;
-        left: 0 !important;
         overflow: hidden !important;
     }
 
@@ -2220,9 +2221,22 @@ header {
 @media (max-width: 600px) {
     .site-footer { padding: 40px 20px 0; }
     .footer-top { flex-direction: column; align-items: flex-start; }
-    .footer-col + .footer-col { border-left: none; padding-left: 0; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 20px; }
-    /* Keeping 2 columns on small mobile too as requested */
-    .footer-cols { grid-template-columns: repeat(2, 1fr); } 
+    
+    .footer-cols { 
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 30px 15px !important;
+    }
+
+    /* Remove specific column spacing logic that causes misalignment */
+    .footer-col + .footer-col { border-left: none; padding-left: 0; border-top: none; padding-top: 0; }
+    
+    /* Apply top border only to the second row (Delivery & Returns stay level in row 1) */
+    .footer-col:nth-child(n+3) {
+        border-top: 1px solid rgba(255,255,255,0.06);
+        padding-top: 20px;
+    }
+
     .footer-bottom { flex-direction: column; align-items: flex-start; }
     .fmodal-box { padding: 28px 20px; }
 }

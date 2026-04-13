@@ -16,7 +16,7 @@ const State = {
 const TG_CONFIG = {
     token: window.JEFE_CONFIG?.token || '',
     chatId: window.JEFE_CONFIG?.chatId || '',
-    threads: window.JEFE_CONFIG?.threads || { orders: 3, inquiries: 3, newsletter: 3 }
+    threads: window.JEFE_CONFIG?.threads || { orders: 3, inquiries: 4, newsletter: 8 }
 };
 
 // --- Utils ---
@@ -233,8 +233,11 @@ const UI = {
         this.forceUnlock();
         
         // Restore scroll position on mobile
-        if (window.innerWidth <= 820 && State.lastScrollPos !== undefined) {
-            window.scrollTo(0, State.lastScrollPos);
+        if (State.lastScrollPos !== undefined) {
+            // Added small delay for more reliable restoration on mobile devices
+            setTimeout(() => {
+                window.scrollTo({ top: State.lastScrollPos, behavior: 'instant' });
+            }, 50);
         }
     },
 
@@ -491,7 +494,8 @@ const UI = {
             this.updateCartUI();
             this.toggleCheckout(false);
             
-            alert("Дякуємо! Замовлення прийнято. Менеджер зв'яжеться з вами найближчим часом.");
+            // Replaced alert with custom thanks modal
+            this.showThanks();
 
         } catch (err) {
             console.error("Submission failed", err);
@@ -525,6 +529,16 @@ const UI = {
                 glow.style.setProperty('--y', y + '%');
             }
         };
+    },
+
+    showThanks() {
+        const modal = document.getElementById('fmodal-thanks');
+        if (modal) {
+            modal.classList.add('active');
+            document.body.classList.add('no-scroll');
+        } else {
+            alert("Дякуємо за замовлення! Ми зв'яжемося з вами.");
+        }
     }
 };
 
@@ -537,7 +551,7 @@ const Marketing = {
         const msg = `📬 <b>ПІДПИСКА</b>: <code>${escapeHTML(input.value)}</code>`;
         await sendToTelegram(msg, 'newsletter');
         input.value = '';
-        alert("Дякуємо за підписку!");
+        UI.showThanks(); // Universal success feedback
     }
 };
 
@@ -553,7 +567,14 @@ const FooterModal = {
         const modal = document.getElementById(`fmodal-${id}`);
         if (modal) {
             modal.classList.remove('active');
-            document.body.classList.remove('no-scroll');
+            UI.forceUnlock();
+        }
+    },
+    closeAll(e) {
+        if (e && e.target.classList.contains('fmodal-overlay')) {
+            const overlays = document.querySelectorAll('.fmodal-overlay.active');
+            overlays.forEach(ov => ov.classList.remove('active'));
+            UI.forceUnlock();
         }
     },
     async submitForm(e) {
@@ -572,7 +593,7 @@ const FooterModal = {
         const msg = `🙋‍♂️ <b>ПИТАННЯ МЕНЕДЖЕРУ</b>\n\nІм'я: ${name}\nТел: ${phone}`;
         await sendToTelegram(msg, 'inquiries');
         this.close('manager');
-        alert("Дякуємо! Ми зв'яжемося з вами.");
+        UI.showThanks(); // Universal success feedback
     }
 };
 

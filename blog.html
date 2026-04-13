@@ -385,21 +385,196 @@
             </div>
         </div>
     </div>
-    <!-- Simple manager popup for blog -->
-    <div class="manager-popup" id="fmodal-manager">
-        <div class="mp-box">
-            <button class="mp-close" onclick="FooterModal.close('manager')">×</button>
-            <h4>Зв'язатися з нами</h4>
-            <br>
-            <div class="mp-field">
-                <label>Ім'я</label>
-                <input type="text" id="mgr-name" placeholder="Олександр">
+    <!-- Modal: Thank You / Success -->
+    <div class="fmodal-overlay" id="fmodal-thanks" onclick="FooterModal.closeAll(event)">
+        <div class="fmodal-box" style="text-align: center;">
+            <button class="fmodal-close" onclick="FooterModal.close('thanks')">×</button>
+            <div class="fmodal-icon" style="font-size: 3rem; margin-bottom: 20px;">🍵</div>
+            <h3 style="font-size: 2rem; margin-bottom: 15px;">Дякуємо!</h3>
+            <div class="fmodal-content">
+                <p style="font-size: 1.1rem; line-height: 1.6; opacity: 0.8;">
+                    Ваш запит отримано. Менеджер зв'яжеться з вами найближчим часом через обраний месенджер або телефон.
+                </p>
             </div>
-            <div class="mp-field">
-                <label>Телефон</label>
-                <input type="tel" id="mgr-phone" placeholder="+380">
+            <button class="btn-checkout-white" onclick="FooterModal.close('thanks')" style="margin-top: 30px; width: 100%;">Зрозуміло</button>
+        </div>
+    </div>
+
+    <!-- Sidebar: Catalog / Category Breakdown -->
+    <div id="cat-sidebar" class="sidebar">
+        <div class="sidebar-overlay" onclick="UI.toggleSidebar('cat', false)"></div>
+        <div class="sidebar-content">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 40px;">
+                <h3 style="font-family: var(--font-body); font-weight: 900; font-size: 2rem;">Категорії</h3>
+                <button type="button" class="nav-btn" onclick="UI.toggleSidebar('cat', false)">&times;</button>
             </div>
-            <button class="mp-submit" onclick="FooterModal.submitForm(event)">Відправити</button>
+            <div id="cat-list" style="display: flex; flex-direction: column; gap: 20px;">
+                <!-- Categories injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar: Shopping Box -->
+    <div id="cart-sidebar" class="sidebar">
+        <div class="sidebar-overlay" onclick="UI.toggleSidebar('cart', false)"></div>
+        <div class="sidebar-content">
+            <div class="sidebar-header">
+                <h3>Кошик</h3>
+                <button type="button" class="nav-btn" onclick="UI.toggleSidebar('cart', false)">&times;</button>
+            </div>
+            <div id="cart-items" class="sidebar-body">
+                <!-- Cart items -->
+            </div>
+            <div id="cart-footer-block" class="sidebar-footer">
+                <div class="sidebar-total">
+                    <span>Всього</span>
+                    <span id="cart-total">0₴</span>
+                </div>
+                <div class="cart-actions-vertical">
+                    <button type="button" class="btn-checkout-white" onclick="UI.checkout()">Оформити замовлення</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Checkout Sidebar -->
+    <div id="checkout-sidebar" class="sidebar">
+        <div class="sidebar-overlay" onclick="UI.toggleCheckout(false)"></div>
+        <div class="sidebar-content">
+            <div class="sidebar-header">
+                <h3>Оформити</h3>
+                <button type="button" class="nav-btn" onclick="UI.toggleCheckout(false)">&times;</button>
+            </div>
+            <div class="sidebar-body">
+            
+            <form id="checkout-form" onsubmit="UI.handleCheckoutSubmit(event)">
+                <div class="checkout-fields">
+                    <div class="c-field messenger-field">
+                        <label>Ваш месенджер *</label>
+                        <div class="messenger-selector-tg">
+                            <label class="messenger-option-tg">
+                                <input type="radio" name="order-messenger" value="Telegram" checked>
+                                <span class="messenger-box-tg">Telegram</span>
+                            </label>
+                            <label class="messenger-option-tg">
+                                <input type="radio" name="order-messenger" value="Viber">
+                                <span class="messenger-box-tg">Viber</span>
+                            </label>
+                            <label class="messenger-option-tg">
+                                <input type="radio" name="order-messenger" value="WhatsApp">
+                                <span class="messenger-box-tg">WhatsApp</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="c-field">
+                        <label>Номер телефону *</label>
+                        <input type="tel" id="co-phone" value="+380" placeholder="+380 XX XXX XX XX" required>
+                    </div>
+
+                    <div class="c-field desktop-only">
+                        <label>ПІБ (необов'язково)</label>
+                        <input type="text" id="co-name" placeholder="Іванов Іван">
+                    </div>
+                    
+                    <div class="c-field">
+                        <label>Email (необов'язково)</label>
+                        <input type="email" id="co-email" placeholder="example@mail.com">
+                    </div>
+
+                    <div class="c-field">
+                        <label>Спосіб отримання</label>
+                        <div class="co-options">
+                            <label class="co-option">
+                                <input type="radio" name="delivery-type" value="pickup" checked onchange="UI.onDeliveryTypeChange('pickup')">
+                                <span>Самовивіз</span>
+                            </label>
+                            <label class="co-option">
+                                <input type="radio" name="delivery-type" value="delivery" onchange="UI.onDeliveryTypeChange('delivery')">
+                                <span>Доставка</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Pickup Address -->
+                    <div id="co-pickup-info" class="co-info-block">
+                        <div class="co-info-text">
+                            <strong>Адреса:</strong> Нагірна 16, Київ
+                        </div>
+                    </div>
+
+                    <!-- Delivery Options (Conditional) -->
+                    <div id="co-delivery-options" style="display: none;">
+                        <div class="c-field">
+                            <label>Варіант доставки</label>
+                            <div class="co-options">
+                                <label class="co-option">
+                                    <input type="radio" name="courier-type" value="np" checked onchange="UI.onCourierChange('np')">
+                                    <span>Нова Пошта</span>
+                                </label>
+                                <label class="co-option">
+                                    <input type="radio" name="courier-type" value="taxi" onchange="UI.onCourierChange('taxi')">
+                                    <span>Таксі</span>
+                                </label>
+                            </div>
+                            <small class="co-hint">За тарифами перевізника</small>
+                        </div>
+
+                        <!-- Nova Poshta Fields -->
+                        <div id="co-np-fields">
+                            <div class="c-field">
+                                <label>Місто *</label>
+                                <input type="text" id="co-np-city" placeholder="Київ">
+                            </div>
+                            <div class="c-field">
+                                <label>№ Відділення або поштомату *</label>
+                                <input type="text" id="co-np-branch" placeholder="Відділення №1">
+                            </div>
+                        </div>
+
+                        <!-- Taxi Fields -->
+                        <div id="co-taxi-fields" style="display: none;">
+                            <div class="c-field">
+                                <label>Адреса доставки *</label>
+                                <input type="text" id="co-taxi-address" placeholder="вул. Хрещатик, 1">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="c-field">
+                        <label>Коментар до замовлення</label>
+                        <textarea id="co-comment" placeholder="Наприклад: зателефонуйте перед доставкою..."></textarea>
+                    </div>
+                </div>
+
+            </form>
+            </div>
+            <div class="sidebar-footer">
+                <div class="sidebar-total">
+                    <span>До сплати</span>
+                    <span id="co-total">0₴</span>
+                </div>
+                <div class="cart-actions-vertical">
+                    <button type="submit" form="checkout-form" class="btn-checkout-white">Підтвердити замовлення</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Overlay -->
+    <div id="search-overlay" class="search-overlay">
+        <div class="search-overlay-bg" onclick="UI.toggleSearch(false)"></div>
+        <div class="search-panel">
+            <div class="search-input-wrap">
+                <svg class="search-icon-inner" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
+                    <path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <input type="text" id="search-input" class="search-input" placeholder="Знайти чай..." autocomplete="off" oninput="UI.handleSearch(this.value)">
+                <button type="button" class="search-close-btn" onclick="UI.toggleSearch(false)" aria-label="Закрити">&times;</button>
+            </div>
+            <div class="search-hint" id="search-hint">Почни вводити назву чаю або категорію</div>
+            <div id="search-results" class="search-results"></div>
         </div>
     </div>
 
