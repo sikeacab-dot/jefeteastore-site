@@ -248,11 +248,18 @@ const UI = {
     closeAddedPopup(action) {
         const popup = document.getElementById('added-popup');
         if (popup) popup.classList.remove('active');
-        // Only remove scroll lock if no other sidebars are active
-        if (!document.querySelector('.sidebar.active')) {
-            document.body.classList.remove('no-scroll');
+        
+        // Always unlock initially to be safe for non-sidebar actions
+        document.body.classList.remove('no-scroll');
+        
+        if (action === 'checkout') {
+            this.toggleSidebar('cart', true);
+        } else {
+            // Re-verify if any other sidebar is actually open before leaving unlocked
+            if (document.querySelector('.sidebar.active')) {
+                document.body.classList.add('no-scroll');
+            }
         }
-        if (action === 'checkout') this.toggleSidebar('cart', true);
     },
 
     updateCartUI() {
@@ -305,7 +312,17 @@ const UI = {
     toggleSidebar(type, open) {
         const el = document.getElementById(`${type}-sidebar`);
         if (el) el.classList.toggle('active', open);
-        document.body.classList.toggle('no-scroll', open);
+        
+        // More robust state check
+        if (open) {
+            document.body.classList.add('no-scroll');
+        } else {
+            // Only unlock if NO other sidebars OR full-screen modals are active
+            const activeElements = document.querySelectorAll('.sidebar.active, .detail-view.active, .fmodal-overlay.active');
+            if (activeElements.length === 0) {
+                document.body.classList.remove('no-scroll');
+            }
+        }
     },
 
     toggleSearch(open) {
@@ -548,4 +565,16 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-document.addEventListener('DOMContentLoaded', () => UI.init());
+// Global Scroll Reset for Navigation (Fixes the "frozen screen" bug)
+window.addEventListener('popstate', () => {
+    document.body.classList.remove('no-scroll');
+    // Also close overlays on back button to sync UI
+    const overlays = document.querySelectorAll('.sidebar.active, .detail-view.active, .fmodal-overlay.active, .search-overlay.active');
+    overlays.forEach(ov => ov.classList.remove('active'));
+});
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+    UI.init();
+    State.init();
+});

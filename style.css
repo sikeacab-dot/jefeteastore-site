@@ -1105,29 +1105,39 @@ header {
     width: 95%;
     margin: auto;
     padding: 0;
-    background: #000;
-    border: 1px solid var(--border);
-    border-radius: 20px;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
     display: grid;
     grid-template-columns: 1fr 1.15fr;
-    overflow: hidden;
-    align-items: stretch; /* Sync left and right column heights */
+    overflow: visible;
+    align-items: stretch;
 }
 
 .detail-media {
     width: 100%;
-    background: #000;
+    background: #000 !important;
     position: relative;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    padding-top: 80px; /* Matching text padding-top */
-    min-height: 480px;
+    padding-top: 132px; /* Aligned with product title baseline */
+    min-height: auto;
+    border: none !important;
+    border-radius: 0 !important;
 }
 
-.img-slider, .img-slider-track, .img-slide {
-    height: 100%;
+.img-slider {
     width: 100%;
+    aspect-ratio: 1 / 1 !important; /* Strict square frame */
+    overflow: hidden;
+    height: auto !important; /* Prevent stretching to match description height */
+}
+
+.img-slider-track, .img-slide {
+    width: 100%;
+    height: 100%;
 }
 
 .img-slide img {
@@ -1394,21 +1404,14 @@ header {
     width: 100%;
     height: 100%;
     position: relative;
-    background: linear-gradient(
-        90deg, 
-        rgba(255,255,255,0) 0, 
-        rgba(255,255,255,0.03) 50%, 
-        rgba(255,255,255,0) 100%
-    );
-    background-size: 200% 100%;
-    animation: shimmer 1.5s infinite;
+    background: transparent; /* Removed shimmer gradient */
 }
 
 .img-slide img {
     width: 100%;
     height: 100%;
     display: block;
-    object-fit: contain;
+    object-fit: contain; /* Show 100% of the image without cropping */
 }
 
 /* Arrow buttons */
