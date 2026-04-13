@@ -23,6 +23,19 @@
         --accent-glow: rgba(255,255,255,0.05);
     }
 
+    /* Reset scroll lock behavior for mobile to prevent jump-to-top */
+    body.no-scroll {
+        position: static !important;
+        overflow: hidden !important;
+        height: auto !important;
+        touch-action: none !important;
+    }
+
+    /* Ensure all decorative layers don't block scrolling */
+    .grain, .mesh-glow, .bg-glow, .video-bg {
+        pointer-events: none !important;
+    }
+
     body { background: #000 !important; }
 
     /* Performance: Hard-kill heavy effects on mobile */

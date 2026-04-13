@@ -200,6 +200,10 @@ const UI = {
         `;
 
         if (weights.length > 0) State.selectedVariant = { grams: weights.includes('100') ? '100' : weights[0], price: initialPrice };
+        
+        // Save scroll position for mobile restoration
+        State.lastScrollPos = window.scrollY;
+        
         modal.classList.add('active');
         document.body.classList.add('no-scroll');
     },
@@ -214,6 +218,11 @@ const UI = {
     closeDetail() {
         document.getElementById('product-detail').classList.remove('active');
         document.body.classList.remove('no-scroll');
+        
+        // Restore scroll position on mobile
+        if (window.innerWidth <= 820 && State.lastScrollPos !== undefined) {
+            window.scrollTo(0, State.lastScrollPos);
+        }
     },
 
     addToCart(id) {
@@ -575,6 +584,10 @@ window.addEventListener('popstate', () => {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
+    // Hard unlock on start
+    document.body.classList.remove('no-scroll');
+    window.scrollTo(0,0);
+    
     UI.init();
     State.init();
 });
