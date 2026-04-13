@@ -47,6 +47,19 @@ async function sendToTelegram(message, threadType = 'orders') {
 
 // --- Core UI Engine ---
 const UI = {
+    // Universal Force Unlock Utility
+    forceUnlock() {
+        document.body.classList.remove('no-scroll');
+        document.documentElement.classList.remove('no-scroll');
+        // Clear inline styles that might have been added
+        document.body.style.overflow = '';
+        document.body.style.position = '';
+        document.body.style.touchAction = '';
+        document.body.style.height = '';
+        document.documentElement.style.overflow = '';
+        document.documentElement.style.height = '';
+    },
+
     init() {
         console.log("JEFE: Engine Active. Stability Mode.");
         try { State.cart = JSON.parse(localStorage.getItem('jefe_cart')) || []; } catch(e) { State.cart = []; }
@@ -217,7 +230,7 @@ const UI = {
 
     closeDetail() {
         document.getElementById('product-detail').classList.remove('active');
-        document.body.classList.remove('no-scroll');
+        this.forceUnlock();
         
         // Restore scroll position on mobile
         if (window.innerWidth <= 820 && State.lastScrollPos !== undefined) {
@@ -258,8 +271,7 @@ const UI = {
         const popup = document.getElementById('added-popup');
         if (popup) popup.classList.remove('active');
         
-        // Always unlock initially to be safe for non-sidebar actions
-        document.body.classList.remove('no-scroll');
+        this.forceUnlock();
         
         if (action === 'checkout') {
             this.toggleSidebar('cart', true);
@@ -326,10 +338,11 @@ const UI = {
         if (open) {
             document.body.classList.add('no-scroll');
         } else {
-            // Only unlock if NO other sidebars OR full-screen modals are active
-            const activeElements = document.querySelectorAll('.sidebar.active, .detail-view.active, .fmodal-overlay.active');
-            if (activeElements.length === 0) {
-                document.body.classList.remove('no-scroll');
+            this.forceUnlock();
+            // Only re-lock if OTHER components are still active
+            const activeElements = document.querySelectorAll('.sidebar.active, .detail-view.active, .fmodal-overlay.active, .search-overlay.active');
+            if (activeElements.length > 0) {
+                document.body.classList.add('no-scroll');
             }
         }
     },
@@ -576,7 +589,7 @@ document.addEventListener('keydown', (e) => {
 
 // Global Scroll Reset for Navigation (Fixes the "frozen screen" bug)
 window.addEventListener('popstate', () => {
-    document.body.classList.remove('no-scroll');
+    UI.forceUnlock();
     // Also close overlays on back button to sync UI
     const overlays = document.querySelectorAll('.sidebar.active, .detail-view.active, .fmodal-overlay.active, .search-overlay.active');
     overlays.forEach(ov => ov.classList.remove('active'));
