@@ -10,7 +10,38 @@ const State = {
     itemsPerPage: 12,
     cart: [],
     selectedVariant: null,
-    isMobile: window.matchMedia("(max-width: 820px)").matches
+    isMobile: window.matchMedia("(max-width: 820px)").matches,
+    activeOverlays: new Set() // Track active modal/sidebar IDs for robust scroll locking
+};
+
+const ScrollManager = {
+    lock(id) {
+        State.activeOverlays.add(id);
+        document.body.classList.add('no-scroll');
+        document.documentElement.classList.add('no-scroll');
+        // Prevent bounce on mobile
+        document.body.style.overscrollBehavior = 'none';
+        console.log(`JEFE Scroll: Locked by ${id}. Total: ${State.activeOverlays.size}`);
+    },
+    unlock(id) {
+        State.activeOverlays.delete(id);
+        if (State.activeOverlays.size === 0) {
+            document.body.classList.remove('no-scroll');
+            document.documentElement.classList.remove('no-scroll');
+            document.body.style.overflow = '';
+            document.body.style.overscrollBehavior = '';
+            console.log(`JEFE Scroll: High Release.`);
+        } else {
+            console.log(`JEFE Scroll: Partial Release (${id}). Remaining: ${State.activeOverlays.size}`);
+        }
+    },
+    forceUnlockAll() {
+        State.activeOverlays.clear();
+        document.body.classList.remove('no-scroll');
+        document.documentElement.classList.remove('no-scroll');
+        document.body.style.overflow = '';
+        document.body.style.overscrollBehavior = '';
+    }
 };
 
 const TG_CONFIG = {
@@ -49,15 +80,7 @@ async function sendToTelegram(message, threadType = 'orders') {
 const UI = {
     // Universal Force Unlock Utility
     forceUnlock() {
-        document.body.classList.remove('no-scroll');
-        document.documentElement.classList.remove('no-scroll');
-        // Clear inline styles that might have been added
-        document.body.style.overflow = '';
-        document.body.style.position = '';
-        document.body.style.touchAction = '';
-        document.body.style.height = '';
-        document.documentElement.style.overflow = '';
-        document.documentElement.style.height = '';
+        ScrollManager.forceUnlockAll();
     },
 
     init() {
@@ -126,17 +149,22 @@ const UI = {
         if (scroll) document.querySelector('#collection').scrollIntoView({ behavior: 'smooth' });
     },
 
-    renderProducts() {
+    renderProducts(append = false) {
         const grid = document.getElementById('product-grid');
         if (!grid) return;
 
-        const items = State.filteredItems.slice(0, State.visibleCount);
-        if (items.length === 0) {
-            grid.innerHTML = `<div style="padding:100px; opacity:0.3; width:100%; text-align:center;">Товарів не знайдено</div>`;
-            return;
+        const currentItemsCount = append ? grid.querySelectorAll('.card').length : 0;
+        const itemsToRender = State.filteredItems.slice(currentItemsCount, State.visibleCount);
+        
+        if (!append) {
+            if (itemsToRender.length === 0) {
+                grid.innerHTML = `<div style="padding:100px; opacity:0.3; width:100%; text-align:center;">Товарів не знайдено</div>`;
+                return;
+            }
+            grid.innerHTML = '';
         }
 
-        grid.innerHTML = items.map(p => {
+        const html = itemsToRender.map(p => {
             const img = p.images?.[0] || p.image || '';
             const price = p.variants ? (p.variants['100'] || Object.values(p.variants)[0]) : (p.price || 0);
             return `
@@ -153,6 +181,13 @@ const UI = {
                 </div>
             `;
         }).join('');
+
+        if (append) {
+            grid.insertAdjacentHTML('beforeend', html);
+        } else {
+            grid.innerHTML = html;
+        }
+
         this.setupObservers();
     },
 
@@ -162,7 +197,7 @@ const UI = {
         const obs = new IntersectionObserver(entries => {
             if (entries[0].isIntersecting && State.visibleCount < State.filteredItems.length) {
                 State.visibleCount += State.itemsPerPage;
-                this.renderProducts();
+                this.renderProducts(true);
             }
         }, { rootMargin: '300px' });
         obs.observe(sentinel);
@@ -218,7 +253,7 @@ const UI = {
         State.lastScrollPos = window.scrollY;
         
         modal.classList.add('active');
-        document.body.classList.add('no-scroll');
+        ScrollManager.lock('detail');
     },
 
     selectVariant(id, grams, price) {
@@ -230,7 +265,7 @@ const UI = {
 
     closeDetail() {
         document.getElementById('product-detail').classList.remove('active');
-        this.forceUnlock();
+        ScrollManager.unlock('detail');
         
         // Restore scroll position on mobile
         if (State.lastScrollPos !== undefined) {
@@ -262,27 +297,21 @@ const UI = {
         localStorage.setItem('jefe_cart', JSON.stringify(State.cart));
         this.closeDetail();
         
-        // Show confirmation popup and lock scroll
+        // Show confirmation popup
         const popup = document.getElementById('added-popup');
         if (popup) {
             popup.classList.add('active');
-            document.body.classList.add('no-scroll');
+            ScrollManager.lock('added-popup');
         }
     },
 
     closeAddedPopup(action) {
         const popup = document.getElementById('added-popup');
         if (popup) popup.classList.remove('active');
-        
-        this.forceUnlock();
+        ScrollManager.unlock('added-popup');
         
         if (action === 'checkout') {
             this.toggleSidebar('cart', true);
-        } else {
-            // Re-verify if any other sidebar is actually open before leaving unlocked
-            if (document.querySelector('.sidebar.active')) {
-                document.body.classList.add('no-scroll');
-            }
         }
     },
 
@@ -335,25 +364,29 @@ const UI = {
 
     toggleSidebar(type, open) {
         const el = document.getElementById(`${type}-sidebar`);
-        if (el) el.classList.toggle('active', open);
+        if (!el) return;
         
-        // More robust state check
         if (open) {
-            document.body.classList.add('no-scroll');
+            el.classList.add('active');
+            ScrollManager.lock(type);
         } else {
-            this.forceUnlock();
+            el.classList.remove('active');
+            ScrollManager.unlock(type);
         }
     },
 
     toggleSearch(open) {
         const overlay = document.getElementById('search-overlay');
         const input = document.getElementById('search-input');
-        if (overlay) overlay.classList.toggle('active', open);
+        if (!overlay) return;
+
         if (open) {
-            document.body.classList.add('no-scroll');
+            overlay.classList.add('active');
+            ScrollManager.lock('search');
             setTimeout(() => input?.focus(), 100);
         } else {
-            this.forceUnlock();
+            overlay.classList.remove('active');
+            ScrollManager.unlock('search');
         }
     },
 
@@ -528,7 +561,7 @@ const UI = {
         const modal = document.getElementById('fmodal-thanks');
         if (modal) {
             modal.classList.add('active');
-            document.body.classList.add('no-scroll');
+            ScrollManager.lock('thanks');
         } else {
             alert("Дякуємо за замовлення! Ми зв'яжемося з вами.");
         }
@@ -553,14 +586,14 @@ const FooterModal = {
         const modal = document.getElementById(`fmodal-${id}`);
         if (modal) {
             modal.classList.add('active');
-            document.body.classList.add('no-scroll');
+            ScrollManager.lock(id);
         }
     },
     close(id) {
         const modal = document.getElementById(`fmodal-${id}`);
         if (modal) {
             modal.classList.remove('active');
-            UI.forceUnlock();
+            ScrollManager.unlock(id);
         }
     },
     closeAll(e) {
@@ -612,9 +645,8 @@ window.addEventListener('popstate', () => {
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     // Hard unlock on start
-    document.body.classList.remove('no-scroll');
-    window.scrollTo(0,0);
+    ScrollManager.forceUnlockAll();
+    window.scrollTo(0, 0);
     
     UI.init();
-    State.init();
 });
