@@ -23,11 +23,9 @@
         --accent-glow: rgba(255,255,255,0.05);
     }
 
-    /* Reset scroll lock behavior for mobile to prevent jump-to-top */
+    /* Simplified mobile scroll lock reset */
     body.no-scroll {
-        position: static !important;
         overflow: hidden !important;
-        height: auto !important;
         touch-action: none !important;
     }
 
@@ -202,11 +200,7 @@ body {
 
 body.no-scroll {
     overflow: hidden !important;
-    height: 100% !important;
-    position: fixed !important;
-    width: 100% !important;
     touch-action: none !important;
-    -webkit-overflow-scrolling: none !important;
 }
 
 .grain {

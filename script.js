@@ -342,11 +342,6 @@ const UI = {
             document.body.classList.add('no-scroll');
         } else {
             this.forceUnlock();
-            // Only re-lock if OTHER components are still active
-            const activeElements = document.querySelectorAll('.sidebar.active, .detail-view.active, .fmodal-overlay.active, .search-overlay.active');
-            if (activeElements.length > 0) {
-                document.body.classList.add('no-scroll');
-            }
         }
     },
 
@@ -358,9 +353,7 @@ const UI = {
             document.body.classList.add('no-scroll');
             setTimeout(() => input?.focus(), 100);
         } else {
-            if (!document.querySelector('.sidebar.active')) {
-                document.body.classList.remove('no-scroll');
-            }
+            this.forceUnlock();
         }
     },
 
