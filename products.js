@@ -282,9 +282,9 @@ var products = [
         "variants": {
             "50": 300
         },
-        "image": "assets/products/prod_1771117657775_0.webp",
+        "image": "assets/products/image_4.webp",
         "images": [
-            "assets/products/prod_1771117657775_0.webp"
+            "assets/products/image_4.webp"
         ],
         "origin": "Юньнань, Китай",
         "description": "Концентрований екстракт пуеру з дуже насиченим, «ядерним» смаком. Глибокі ноти темного пуеру, щільність та інтенсивність у кожному ковтку.\n\nЧай для тонусу, концентрації та швидкого ефекту.\n\nЦіна вказана за 50 шт.",
