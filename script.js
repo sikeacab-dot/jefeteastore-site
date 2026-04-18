@@ -165,13 +165,16 @@ const UI = {
         }
 
         const html = itemsToRender.map(p => {
-            const img = p.images?.[0] || p.image || '';
+            const img1 = p.images?.[0] || p.image || '';
+            const img2 = p.images?.[1] || '';
             const price = p.variants ? (p.variants['100'] || Object.values(p.variants)[0]) : (p.price || 0);
+            
             return `
                 <div class="card reveal" onclick="UI.openDetail(${p.id})">
                     ${p.badge && p.badge !== 'none' ? `<div class="badge badge-${p.badge.toLowerCase()}">${p.badge}</div>` : ''}
-                    <div class="card-media">
-                        <img src="${img}" loading="lazy" decoding="async" onload="this.classList.add('loaded')" alt="${p.name}">
+                    <div class="card-media ${img2 ? 'has-hover' : ''}">
+                        <img src="${img1}" class="img-primary" loading="lazy" decoding="async" onload="this.classList.add('loaded')" alt="${p.name}">
+                        ${img2 ? `<img src="${img2}" class="img-secondary" loading="lazy" decoding="async" alt="${p.name}">` : ''}
                     </div>
                     <div class="card-info">
                         <p class="card-cat">${p.category}</p>
