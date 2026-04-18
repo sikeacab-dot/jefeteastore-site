@@ -55,7 +55,7 @@ var products = [
         "image": "assets/products/tuocha2.webp",
         "images": [
             "assets/products/tuocha2.webp",
-            "assets/products/tuocha2.webp"
+            "assets/products/toucha1.webp"
         ],
         "origin": "Юнань, Китай",
         "description": "Легендарний шу пуер, рецепт котрого створювався для експорту пуеру в францію, але він вийшов таким смачним, що став топовою позицію флагманської фабрики \"Xiaguan\"",
