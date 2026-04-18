@@ -11,6 +11,7 @@ const State = {
     cart: [],
     selectedVariant: null,
     isMobile: window.matchMedia("(max-width: 820px)").matches,
+    currentDetailSlide: 0, // Track current image in slider
     activeOverlays: new Set() // Track active modal/sidebar IDs for robust scroll locking
 };
 
@@ -210,6 +211,7 @@ const UI = {
         const p = State.db.find(x => x.id === id);
         if (!p) return;
         State.selectedVariant = null;
+        State.currentDetailSlide = 0; // Reset slider position
 
         const modal = document.getElementById('product-detail');
         const container = document.getElementById('detail-content');
@@ -223,9 +225,20 @@ const UI = {
             <div class="detail-container--v2">
                 <div class="detail-media">
                     <div class="img-slider">
-                        <div class="img-slider-track">
+                        <div class="img-slider-track" id="detail-track">
                             ${images.map(src => `<div class="img-slide"><img src="${src}"></div>`).join('')}
                         </div>
+                        ${images.length > 1 ? `
+                            <button class="img-slider-btn img-slider-prev" onclick="UI.moveSlide(-1)">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+                            </button>
+                            <button class="img-slider-btn img-slider-next" onclick="UI.moveSlide(1)">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+                            </button>
+                            <div class="img-slider-dots">
+                                ${images.map((_, idx) => `<button class="img-dot ${idx===0?'active':''}" onclick="UI.setSlide(${idx})"></button>`).join('')}
+                            </div>
+                        ` : ''}
                     </div>
                 </div>
                 <div class="detail-info--v2">
@@ -264,6 +277,30 @@ const UI = {
         const priceEl = document.getElementById('detail-price');
         if (priceEl) priceEl.innerText = `${price}₴`;
         document.querySelectorAll('.weight-btn').forEach(b => b.classList.toggle('active', b.innerText === grams+'г'));
+    },
+
+    moveSlide(dir) {
+        const slides = document.querySelectorAll('.img-slide');
+        if (slides.length <= 1) return;
+        
+        let next = State.currentDetailSlide + dir;
+        if (next < 0) next = slides.length - 1;
+        if (next >= slides.length) next = 0;
+        
+        this.setSlide(next);
+    },
+
+    setSlide(index) {
+        State.currentDetailSlide = index;
+        const track = document.getElementById('detail-track');
+        if (track) {
+            track.style.transform = `translateX(-${index * 100}%)`;
+        }
+        
+        // Update dots
+        document.querySelectorAll('.img-dot').forEach((dot, i) => {
+            dot.classList.toggle('active', i === index);
+        });
     },
 
     closeDetail() {
