@@ -1,5 +1,73 @@
 var products = [
     {
+        "id": 1776520969142,
+        "name": "Уі Шуй Сянь \"Нарцисс\" (Порційний)",
+        "category": "Oolong",
+        "price": 600,
+        "variants": {
+            "50": 350,
+            "100": 600
+        },
+        "image": "assets/products/narciss2.2.webp",
+        "images": [
+            "assets/products/narciss2.2.webp",
+            "assets/products/narciss2.1.webp"
+        ],
+        "origin": "Гори Уї (Уїшань)",
+        "description": "Цей сорт став еталоном скельних улунів завдяки глибокому, багатогранному смаку з м’якими деревними та медовими нотами, а також сильному заспокійливому ефекту.",
+        "on_order": false,
+        "badge": "NEW",
+        "brewing": {
+            "steeps": 7,
+            "time": 20,
+            "grams": 7
+        }
+    },
+    {
+        "id": 1776520702809,
+        "name": "Фен Хуан Дан Цун",
+        "category": "Oolong",
+        "price": 600,
+        "variants": {
+            "50": 300,
+            "100": 600
+        },
+        "image": "assets/products/fxdc.webp",
+        "images": [
+            "assets/products/fxdc.webp"
+        ],
+        "origin": "Гори \"Фен Хуан\", провінція Гуандун",
+        "description": "Легендарний гуандунський улун, що славиться своїм феноменальним ароматом, який порівнюють з пахощами диких орхідей та меду. Це справжній «чайний парфум», який став візитівкою гір Фенікса завдяки своєму яскравому багатогранному смаку та сильному енергійному стану.",
+        "on_order": false,
+        "badge": "NEW",
+        "brewing": {
+            "steeps": 7,
+            "time": 20,
+            "grams": 8
+        }
+    },
+    {
+        "id": 1776520434777,
+        "name": "Шу Пуер \"Точа\"",
+        "category": "Puerh",
+        "price": 500,
+        "variants": null,
+        "image": "assets/products/tuocha2.webp",
+        "images": [
+            "assets/products/tuocha2.webp",
+            "assets/products/tuocha2.webp"
+        ],
+        "origin": "Юнань, Китай",
+        "description": "Легендарний шу пуер, рецепт котрого створювався для експорту пуеру в францію, але він вийшов таким смачним, що став топовою позицію флагманської фабрики \"Xiaguan\"",
+        "on_order": false,
+        "badge": "NEW",
+        "brewing": {
+            "steeps": 7,
+            "time": 20,
+            "grams": 8
+        }
+    },
+    {
         "id": 1775867761283,
         "name": "Габа \"Сапфір\"",
         "category": "Gaba",

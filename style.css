@@ -5,6 +5,12 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Agoka&family=Inter:wght@400;700;900&family=Playfair+Display:ital,wght@0,900;1,900&display=swap');
 
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
 :root {
     --bg: #000;
     --text: #fff;
@@ -2561,6 +2567,20 @@ header {
     width: 90%;
     max-width: 680px;
     transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (max-width: 768px) {
+    .search-panel {
+        top: 80px;
+        width: 95%;
+    }
+    .search-input-wrap {
+        padding: 14px 10px 14px 16px !important;
+        gap: 10px !important;
+    }
+    .search-input {
+        font-size: 1rem !important;
+    }
 }
 
 .search-overlay.active .search-panel {
