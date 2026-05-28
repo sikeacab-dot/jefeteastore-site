@@ -183,10 +183,10 @@ var products = [
 "id": 1775867761283,
 "name": "Габа \"Сапфір\"",
 "category": "Gaba",
-"price": 500,
+"price": 550,
 "variants": {
 "50": 300,
-"100": 500
+"100": 550
 },
 "image": "assets/products/Gabasaphire.webp",
 "images": [
@@ -374,10 +374,10 @@ var products = [
 "id": 1,
 "name": "Габа \"King Gaba\"",
 "category": "Gaba",
-"price": 600,
+"price": 750,
 "variants": {
-"50": 350,
-"100": 600
+"50": 400,
+"100": 750
 },
 "image": "assets/products/prod_1_0.webp",
 "images": [
