@@ -1,29 +1,73 @@
 var products = [
 {
-"id": 1779933225171,
-"name": "Шу Пуер 908",
-"category": "Puerh",
+"id": 1780525280220,
+"name": "Габа \"Те Гуань Інь\"",
+"category": "Gaba",
 "price": 550,
 "variants": {
 "50": 300,
-"100": 550,
-"200": 1300,
-"250": 1300
+"100": 550
 },
-"image": "assets/products/shu9081.webp",
+"image": "assets/products/Gabatieguanyin.webp",
 "images": [
-"assets/products/shu9081.webp",
-"assets/products/shu9082.webp",
-"assets/products/shu9083.webp"
+"assets/products/Gabatieguanyin.webp"
 ],
-"origin": "Юнань, Китай",
-"description": "Відомий 908 рецепт приготування пуеру від фабрики Haiwan, дуже зручний варіант щоб завжди мати з собою порцію улюбленого чаю. Також ідеально підійде до знайомства з пуерами.",
+"origin": "",
+"description": "Габований Те Гуань Інь, з великою концентрацію ГАМК. Створений для поціновачів заспокійливого ефекту габи, та смаку класичного Те Гуань Інь.",
 "on_order": false,
 "badge": "NEW",
 "brewing": {
-"steeps": 0,
+"steeps": 7,
 "time": 20,
-"grams": 0
+"grams": 8
+}
+},
+{
+"id": 1780525093170,
+"name": "Габа \"Дикий мед\"",
+"category": "Gaba",
+"price": 600,
+"variants": {
+"50": 350,
+"100": 600
+},
+"image": "assets/products/Gabawildhoney.webp",
+"images": [
+"assets/products/Gabawildhoney.webp"
+],
+"origin": "",
+"description": "Перша в світі габа з натуральним диким медом. Дуже смачна габа з нотами карамелі, квітів, ванилі, випічки, та медової солодкості. Сорт створений за стандартною габа технологією, без додавання ароматизаторів.",
+"on_order": false,
+"badge": "NEW",
+"brewing": {
+"steeps": 6,
+"time": 20,
+"grams": 7
+}
+},
+{
+"id": 1780524614186,
+"name": "Габа Шу Пуер",
+"category": "Gaba",
+"price": 600,
+"variants": {
+"50": 350,
+"100": 600
+},
+"image": "assets/products/Gabashupuerh1.webp",
+"images": [
+"assets/products/Gabashupuerh1.webp",
+"assets/products/Gabashupuerh2.webp",
+"assets/products/Gabashupuerh3.webp"
+],
+"origin": "Менхай, Китай",
+"description": "Чайний лист, пройшовший стандартну для шу пуеру ферментацію та додатково габований. Має незвичайний, легкий, трохи солодкуватий смак. Вечірній варіант з ледь замітною землянистою нотою шу пуеру.",
+"on_order": false,
+"badge": "NEW",
+"brewing": {
+"steeps": 4,
+"time": 20,
+"grams": 8
 }
 },
 {
@@ -54,8 +98,32 @@ var products = [
 }
 },
 {
+"id": 1776520434777,
+"name": "Шу Пуер \"Точа\"",
+"category": "Puerh",
+"price": 500,
+"variants": {
+"50": 300,
+"100": 500
+},
+"image": "assets/products/tuocha2.webp",
+"images": [
+"assets/products/tuocha2.webp",
+"assets/products/toucha1.webp"
+],
+"origin": "Юнань, Китай",
+"description": "Легендарний шу пуер, рецепт котрого створювався для експорту пуеру в францію, але він вийшов таким смачним, що став топовою позицію флагманської фабрики \"Xiaguan\"",
+"on_order": false,
+"badge": "HIT",
+"brewing": {
+"steeps": 7,
+"time": 20,
+"grams": 8
+}
+},
+{
 "id": 1775867642449,
-"name": "Габа Да Хун Пао",
+"name": "Габа \"Да Хун Пао\"",
 "category": "Gaba",
 "price": 600,
 "variants": {
@@ -78,24 +146,24 @@ var products = [
 }
 },
 {
-"id": 1779932529362,
-"name": "Шу Пуер Гунтін \"Зірки\" ",
+"id": 1779933225171,
+"name": "Шу Пуер 908",
 "category": "Puerh",
-"price": 370,
+"price": 550,
 "variants": {
-"50": 250,
-"100": 370,
-"357": 1300
+"50": 300,
+"100": 550,
+"200": 1300,
+"250": 1300
 },
-"image": "assets/products/shustars.webp",
+"image": "assets/products/shu9081.webp",
 "images": [
-"assets/products/shustars.webp",
-"assets/products/shustars4.webp",
-"assets/products/shustars3.webp",
-"assets/products/shustars2.webp"
+"assets/products/shu9081.webp",
+"assets/products/shu9082.webp",
+"assets/products/shu9083.webp"
 ],
 "origin": "Юнань, Китай",
-"description": "Чайний лист, зібраний з старих дерев в 2013 році, котрий пройшов ферментацію та отримав дуже легкий, незвичний для пуеру смак. Для поціновачів витриманих пуерів з великою кількістю бруньок. ",
+"description": "Відомий 908 рецепт приготування пуеру від фабрики Haiwan, дуже зручний варіант щоб завжди мати з собою порцію улюбленого чаю. Також ідеально підійде до знайомства з пуерами.",
 "on_order": false,
 "badge": "NEW",
 "brewing": {
@@ -132,6 +200,33 @@ var products = [
 }
 },
 {
+"id": 1779932529362,
+"name": "Шу Пуер Гунтін \"Зірки\" ",
+"category": "Puerh",
+"price": 370,
+"variants": {
+"50": 250,
+"100": 370,
+"357": 1300
+},
+"image": "assets/products/shustars.webp",
+"images": [
+"assets/products/shustars.webp",
+"assets/products/shustars4.webp",
+"assets/products/shustars3.webp",
+"assets/products/shustars2.webp"
+],
+"origin": "Юнань, Китай",
+"description": "Чайний лист, зібраний з старих дерев в 2013 році, котрий пройшов ферментацію та отримав дуже легкий, незвичний для пуеру смак. Для поціновачів витриманих пуерів з великою кількістю бруньок. ",
+"on_order": false,
+"badge": "NEW",
+"brewing": {
+"steeps": 0,
+"time": 20,
+"grams": 0
+}
+},
+{
 "id": 1779932202777,
 "name": "Шу Пуер \"Кирпич\"",
 "category": "Puerh",
@@ -154,6 +249,57 @@ var products = [
 "steeps": 0,
 "time": 20,
 "grams": 0
+}
+},
+{
+"id": 1775867464850,
+"name": "Молочний улун",
+"category": "Oolong",
+"price": 350,
+"variants": {
+"50": 200,
+"100": 350
+},
+"image": "assets/products/Milkoolong.webp",
+"images": [
+"assets/products/Milkoolong.webp"
+],
+"origin": "Китай",
+"description": "Ніжний чай з високогір’я, що поєднує свіжість зеленого листа та м’якість вершків. Смак збалансований, без терпкості, з приємною природною солодкістю. Гарний вибір, щоб познайомитися з китайською традицією та відновити сили протягом дня.",
+"on_order": false,
+"badge": "HIT",
+"brewing": {
+"steeps": 5,
+"time": 20,
+"grams": 7
+}
+},
+{
+"id": 1779654407869,
+"name": "Шу Пуер \"Точа 23\"",
+"category": "Puerh",
+"price": 500,
+"variants": {
+"50": 300,
+"100": 500,
+"250": 1200
+},
+"image": "assets/products/toucha250.3.webp",
+"images": [
+"assets/products/toucha250.3.webp",
+"assets/products/toucha250.5.webp",
+"assets/products/toucha250.4.webp",
+"assets/products/toucha250.1.webp",
+"assets/products/toucha250.2.webp"
+],
+"origin": "Китай, провінція Юньнань",
+"description": "Китайці називають його \"Фуо\" або \"Маленька Франція\". Флагманська фабрика \"Xiaguan\", 2023 рік. Не дивлячись на недовгу витримку має чистий смак, без земляної вогкості.",
+"on_order": false,
+"badge": "NEW",
+"brewing": {
+"steeps": 5,
+"time": 20,
+"grams": 8
 }
 },
 {
@@ -203,30 +349,6 @@ var products = [
 }
 },
 {
-"id": 1776520434777,
-"name": "Шу Пуер \"Точа\"",
-"category": "Puerh",
-"price": 500,
-"variants": {
-"50": 300,
-"100": 500
-},
-"image": "assets/products/tuocha2.webp",
-"images": [
-"assets/products/tuocha2.webp",
-"assets/products/toucha1.webp"
-],
-"origin": "Юнань, Китай",
-"description": "Легендарний шу пуер, рецепт котрого створювався для експорту пуеру в францію, але він вийшов таким смачним, що став топовою позицію флагманської фабрики \"Xiaguan\"",
-"on_order": false,
-"badge": "HIT",
-"brewing": {
-"steeps": 7,
-"time": 20,
-"grams": 8
-}
-},
-{
 "id": 1775867846686,
 "name": "Да Хун Пао \"Вогняний\"",
 "category": "Oolong",
@@ -245,34 +367,6 @@ var products = [
 "badge": "HIT",
 "brewing": {
 "steeps": 7,
-"time": 20,
-"grams": 8
-}
-},
-{
-"id": 1779654407869,
-"name": "Шу Пуер \"Точа 23\"",
-"category": "Puerh",
-"price": 500,
-"variants": {
-"50": 300,
-"100": 500,
-"250": 1200
-},
-"image": "assets/products/toucha250.3.webp",
-"images": [
-"assets/products/toucha250.3.webp",
-"assets/products/toucha250.5.webp",
-"assets/products/toucha250.4.webp",
-"assets/products/toucha250.1.webp",
-"assets/products/toucha250.2.webp"
-],
-"origin": "Китай, провінція Юньнань",
-"description": "Китайці називають його \"Фуо\" або \"Маленька Франція\". Флагманська фабрика \"Xiaguan\", 2023 рік. Не дивлячись на недовгу витримку має чистий смак, без земляної вогкості.",
-"on_order": false,
-"badge": "NEW",
-"brewing": {
-"steeps": 5,
 "time": 20,
 "grams": 8
 }
@@ -343,29 +437,6 @@ var products = [
 "badge": "none",
 "brewing": {
 "steeps": 7,
-"time": 20,
-"grams": 7
-}
-},
-{
-"id": 1775867464850,
-"name": "Молочний улун",
-"category": "Oolong",
-"price": 350,
-"variants": {
-"50": 200,
-"100": 350
-},
-"image": "assets/products/Milkoolong.webp",
-"images": [
-"assets/products/Milkoolong.webp"
-],
-"origin": "Китай",
-"description": "Ніжний чай з високогір’я, що поєднує свіжість зеленого листа та м’якість вершків. Смак збалансований, без терпкості, з приємною природною солодкістю. Гарний вибір, щоб познайомитися з китайською традицією та відновити сили протягом дня.",
-"on_order": false,
-"badge": "HIT",
-"brewing": {
-"steeps": 5,
 "time": 20,
 "grams": 7
 }
