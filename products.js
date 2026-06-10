@@ -153,7 +153,6 @@ var products = [
 "variants": {
 "50": 300,
 "100": 550,
-"200": 1300,
 "250": 1300
 },
 "image": "assets/products/shu9081.webp",
