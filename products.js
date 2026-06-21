@@ -1,5 +1,77 @@
 var products = [
 {
+"id": 1782017223240,
+"name": "Шу Пуер \"Стовб Дракона\"",
+"category": "Puerh",
+"price": 300,
+"variants": {
+"50": 200,
+"100": 300,
+"357": 1050
+},
+"image": "assets/products/shudragon1.webp",
+"images": [
+"assets/products/shudragon1.webp",
+"assets/products/shudragon2.webp",
+"assets/products/shudragon3.webp"
+],
+"origin": "",
+"description": "Класика шу пуерів з Юнаню, ідеально розкривається за будь-яких умов: від класичного чаювання до заварювання в термосі.",
+"on_order": false,
+"badge": "NEW",
+"brewing": {
+"steeps": 6,
+"time": 20,
+"grams": 8
+}
+},
+{
+"id": 1782016895994,
+"name": "Шу Пуер \"Старі Бруньки\"",
+"category": "Puerh",
+"price": 500,
+"variants": {
+"50": 300,
+"100": 500
+},
+"image": "assets/products/shubrunki.webp",
+"images": [
+"assets/products/shubrunki.webp"
+],
+"origin": "",
+"description": "Купаж від фабрики Фуцзянь із рекордною кількістю золотих бруньок, які дарують напою виняткову м'якість та глибокий, оксамитовий смак.",
+"on_order": false,
+"badge": "NEW",
+"brewing": {
+"steeps": 5,
+"time": 20,
+"grams": 8
+}
+},
+{
+"id": 1782016421729,
+"name": "Габа \"Золото\"",
+"category": "Gaba",
+"price": 600,
+"variants": {
+"50": 350,
+"100": 600
+},
+"image": "assets/products/gabagold.webp",
+"images": [
+"assets/products/gabagold.webp"
+],
+"origin": "",
+"description": "Сорт габи, маючий характерний золотий настій з обволікаючим смаком печеного яблука, пряного меду та фірмовою фруктовою кислинкою.",
+"on_order": false,
+"badge": "NEW",
+"brewing": {
+"steeps": 8,
+"time": 20,
+"grams": 8
+}
+},
+{
 "id": 1780525280220,
 "name": "Габа \"Те Гуань Інь\"",
 "category": "Gaba",
@@ -114,7 +186,7 @@ var products = [
 "origin": "Юнань, Китай",
 "description": "Легендарний шу пуер, рецепт котрого створювався для експорту пуеру в францію, але він вийшов таким смачним, що став топовою позицію флагманської фабрики \"Xiaguan\"",
 "on_order": false,
-"badge": "HIT",
+"badge": "none",
 "brewing": {
 "steeps": 7,
 "time": 20,
@@ -164,7 +236,7 @@ var products = [
 "origin": "Юнань, Китай",
 "description": "Відомий 908 рецепт приготування пуеру від фабрики Haiwan, дуже зручний варіант щоб завжди мати з собою порцію улюбленого чаю. Також ідеально підійде до знайомства з пуерами.",
 "on_order": false,
-"badge": "NEW",
+"badge": "none",
 "brewing": {
 "steeps": 0,
 "time": 20,
@@ -191,7 +263,7 @@ var products = [
 "origin": "Юнань, Китай",
 "description": "Шу Пуер, приготовлений за багатолітнім рецептом, котрий вражає поціновачів вже понад 50 років. Має класичний пуерний смак, з земельними, древесними та глибокими нотами.",
 "on_order": false,
-"badge": "NEW",
+"badge": "none",
 "brewing": {
 "steeps": 0,
 "time": 20,
@@ -294,7 +366,7 @@ var products = [
 "origin": "Китай, провінція Юньнань",
 "description": "Китайці називають його \"Фуо\" або \"Маленька Франція\". Флагманська фабрика \"Xiaguan\", 2023 рік. Не дивлячись на недовгу витримку має чистий смак, без земляної вогкості.",
 "on_order": false,
-"badge": "NEW",
+"badge": "none",
 "brewing": {
 "steeps": 5,
 "time": 20,
